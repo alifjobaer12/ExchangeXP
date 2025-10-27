@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: ExchangeXP
+
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: ExchangeXP
+      auto-index-creation: true
