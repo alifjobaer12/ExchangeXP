@@ -8,3 +8,10 @@ spring:
       port: 27017
       database: ExchangeXP
       auto-index-creation: true
+
+logging:
+  level:
+    com:
+      Shinigami_Coderz:
+        ExchangeXP:
+          ExchangeXP : trace

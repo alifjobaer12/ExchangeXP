@@ -4,16 +4,16 @@ import com.Shinigami_Coderz.ExchangeXP.entity.Blog;
 import com.Shinigami_Coderz.ExchangeXP.entity.User;
 import com.Shinigami_Coderz.ExchangeXP.service.BlogService;
 import com.Shinigami_Coderz.ExchangeXP.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
+@Slf4j
 @RequestMapping("/admin")
 public class AdminController {
 
@@ -25,13 +25,85 @@ public class AdminController {
 
     @GetMapping("/all-users")                                                  //  All User
     public ResponseEntity<?> findAllUsers(){
-        List<User> allUsers = userService.findAllUsers();
-        return allUsers.isEmpty() ? new ResponseEntity<>(HttpStatus.NOT_FOUND) : new ResponseEntity<>(allUsers, HttpStatus.OK);
+
+        long start = System.currentTimeMillis();
+        log.info("AdminController.findAllUsers: Received request to fetch all users.");
+
+        try {
+            List<User> allUsers = userService.findAllUsers();
+            if (allUsers == null || allUsers.isEmpty()){
+                log.warn("AdminController.findAllUsers: No users found in the database.");
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+
+            log.info("AdminController.findAllUsers: Found {} users in the database. (elapsed={}ms)", allUsers.size(), System.currentTimeMillis() - start);
+            return new ResponseEntity<>(allUsers, HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("AdminController.findAllUsers: Exception while fetching users. error={}", e.getMessage(), e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/all-blogs")                                               //  Find all Blogs
     public ResponseEntity<?> findAllBlog(){
-        List<Blog> allBlog = blogService.findAllBlog();
-        return allBlog.isEmpty() ? new ResponseEntity<>(HttpStatus.NOT_FOUND) : new ResponseEntity<>(allBlog, HttpStatus.OK);
+
+        long start = System.currentTimeMillis();
+        log.info("AdminController.findAllBlog: Received request to fetch all blogs.");
+
+        try {
+            List<Blog> allBlog = blogService.findAllBlog();
+            if (allBlog == null || allBlog.isEmpty()){
+                log.warn("AdminController.findAllBlog: No blogs found in the database.");
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+
+            log.info("AdminController.findAllBlog: Found {} blogs in the database. (elapsed={}ms)", allBlog.size(), System.currentTimeMillis() - start);
+            return new ResponseEntity<>(allBlog, HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("AdminController.findAllBlog: Exception while fetching blogs. error={}", e.getMessage(), e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/create-admin")                                                       //  Create a AdminUser
+    public ResponseEntity<?> createUser(@RequestBody User user){
+
+        long start = System.currentTimeMillis();
+        log.info("AdminController.createUser: Received request to create a new admin user. payloadUsername={}", user == null ? "null" : user.getUsername());
+
+        if (user == null) {
+            log.warn("AdminController.createUser: Request body is null.");
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        String username = user.getUsername().trim();
+        String password = user.getPassword().trim();
+        String email = user.getEmail().trim();
+
+        if (username.isEmpty() || password.isEmpty() || email.isEmpty()){
+            log.warn("AdminController.createUser: Missing required user fields for user: {}", username);
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+        }
+
+        try {
+            // ADDED: check duplicate username (defensive)
+            User existing = userService.findUserByUsername(username);
+            if (existing != null) {
+                log.warn("AdminController.createUser: Username '{}' already exists. Rejecting creation.", username);
+                return new ResponseEntity<>(HttpStatus.CONFLICT);
+            }
+
+            boolean isSaved = userService.saveAdminUser(user);
+            if(!isSaved){
+                log.error("AdminController.createUser: Failed to create admin user: {}", username);
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+
+            log.info("AdminController.createUser: Successfully created admin user: {} (elapsed={}ms)", username, System.currentTimeMillis() - start); // ADDED
+            return new ResponseEntity<>(user, HttpStatus.CREATED);
+        } catch (Exception e) {
+            log.error("AdminController.createUser: Exception while creating admin user '{}'. error={}", username, e.getMessage(), e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

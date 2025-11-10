@@ -5,12 +5,11 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 
-@Document(collection = "blogComment")
+@Document(collection = "blog_Comment")
 @Data
 @NoArgsConstructor
 public class BlogComment {
@@ -18,14 +17,13 @@ public class BlogComment {
     @Id
     private ObjectId blogCommentId;
 
+    private String user;
+
     @NonNull
     private String comment;
 
     private LocalDateTime commentAt;
 
-    private String user;
-
-    @DBRef
-    private Blog blog;
+    private ObjectId blogId;
 
 }

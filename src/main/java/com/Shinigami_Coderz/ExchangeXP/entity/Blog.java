@@ -28,7 +28,7 @@ public class Blog {
 
     private LocalDateTime blogDate;
 
-    private long blogLikes;
+//    private List<ObjectId> blogLikes =  new ArrayList<>();
 
     private String username;
 
