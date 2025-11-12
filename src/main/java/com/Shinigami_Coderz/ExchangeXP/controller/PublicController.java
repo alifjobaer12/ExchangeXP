@@ -16,6 +16,13 @@ public class PublicController {
     @Autowired
     private UserService userService;
 
+
+    @GetMapping("/google-signin/{email}")
+    public ResponseEntity<?> googleSignIn(@PathVariable String email) {
+        log.info("sign in with google, {}", email);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @GetMapping("/health-check")                                                  //  Health Check
     public ResponseEntity<?> healthCheck() {
         long start = System.currentTimeMillis();
@@ -66,7 +73,7 @@ public class PublicController {
             }
 
             log.info("PublicController.createUser: Successfully created user '{}' (elapsed={}ms)", username, System.currentTimeMillis() - start);
-            return new ResponseEntity<>(user, HttpStatus.CREATED);
+            return new ResponseEntity<>(user, HttpStatus.OK);
         } catch (Exception e) {
             log.error("PublicController.createUser: Exception while creating user. error={}", e.getMessage(), e);
             return new ResponseEntity<>("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);

@@ -4,8 +4,9 @@ spring:
 
   data:
     mongodb:
-      host: localhost
-      port: 27017
+      uri: ${MONGO_URI}
+#      host: localhost
+#      port: 27017
       database: ExchangeXP
       auto-index-creation: true
 
@@ -15,3 +16,7 @@ logging:
       Shinigami_Coderz:
         ExchangeXP:
           ExchangeXP : trace
+
+# Firebase service account file (local dev). Leave empty to use GOOGLE_APPLICATION_CREDENTIALS env var
+firebase:
+  service-account-file: ${FIREBASE_JSON}

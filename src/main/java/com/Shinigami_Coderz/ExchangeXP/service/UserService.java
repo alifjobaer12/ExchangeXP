@@ -171,4 +171,14 @@ public class UserService {
         }
     }
 
+    public User findUserByEmail(String email) {
+        if (email == null || email.trim().isEmpty()) return null;
+        try {
+            return userRepo.findByEmail(email);
+        } catch (Exception e) {
+            log.error("UserService.findUserByEmail: {}", e.getMessage(), e);
+            return null;
+        }
+    }
+
 }
