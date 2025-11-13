@@ -2,6 +2,9 @@ spring:
   application:
     name: ExchangeXP
 
+server:
+  port: ${PORT}
+
   data:
     mongodb:
       uri: ${MONGO_URI}
@@ -17,6 +20,5 @@ logging:
         ExchangeXP:
           com.Shinigami_Coderz.ExchangeXP.ExchangeXPt: trace
 
-# Firebase service account file (local dev). Leave empty to use GOOGLE_APPLICATION_CREDENTIALS env var
 firebase:
   service-account-file: ${FIREBASE_JSON}
