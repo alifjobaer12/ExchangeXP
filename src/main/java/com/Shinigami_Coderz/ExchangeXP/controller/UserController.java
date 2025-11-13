@@ -1,5 +1,7 @@
 package com.Shinigami_Coderz.ExchangeXP.controller;
 
+import com.Shinigami_Coderz.ExchangeXP.dto.UserReqDto;
+import com.Shinigami_Coderz.ExchangeXP.dto.UserResDto;
 import com.Shinigami_Coderz.ExchangeXP.entity.User;
 import com.Shinigami_Coderz.ExchangeXP.service.BlogService;
 import com.Shinigami_Coderz.ExchangeXP.service.UserService;
@@ -50,25 +52,25 @@ public class UserController {
     }
 
     @PostMapping("/update")                                                  //  Update User Password
-    public ResponseEntity<?> updateUser(@RequestBody(required = false) User user){
+    public ResponseEntity<?> updateUser(@RequestBody(required = false) UserReqDto request) {
         long start = System.currentTimeMillis();
         log.info("UserController.updateUser: Received update request.");
 
         try {
-            if (user == null) {
+            if (request == null) {
                 log.warn("UserController.updateUser: Request body is null.");
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
 
-            String username = user.getUsername().trim();
-            String newPassword = user.getPassword().trim();
+            String username = request.getUsername().trim();
+            String newPassword = request.getPassword().trim();
 
             if (username.isEmpty() || newPassword.isEmpty()) {
                 log.warn("UserController.updateUser: Missing username or password. username='{}'", username);
                 return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
             }
 
-            // Authentication & authorization: only allow the user themselves or admin to update password
+            // Authentication & authorization: only allow the user themselves to update password
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication == null || !authentication.isAuthenticated()) {
                 log.warn("UserController.updateUser: Unauthenticated request for username={}", username);
@@ -87,12 +89,17 @@ public class UserController {
             }
 
             userByUsername.setPassword(newPassword);
-            userService.saveUser(userByUsername);
+            User saved = userService.saveUser(userByUsername);
 
-            userByUsername.setPassword("null");
+            // Entity -> DTO
+            UserResDto response = new UserResDto(
+                    saved.getUserId() != null ? saved.getUserId().toString() : null,
+                    saved.getUsername(),
+                    saved.getEmail()
+            );
 
             log.info("UserController.updateUser: Password updated for username={} (elapsed={}ms)", username, System.currentTimeMillis() - start);
-            return new ResponseEntity<>(userByUsername, HttpStatus.OK);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
             log.error("UserController.updateUser: Exception while updating user. error={}", e.getMessage(), e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -100,23 +107,23 @@ public class UserController {
     }
 
     @DeleteMapping("/delete")                                                  //  Delete User
-    public ResponseEntity<?> deleteUser(@RequestBody(required = false) User user){
+    public ResponseEntity<?> deleteUser(@RequestBody(required = false) UserReqDto request){
         long start = System.currentTimeMillis();
         log.info("UserController.deleteUser: Received delete request.");
 
         try {
-            if (user == null) {
+            if (request == null) {
                 log.warn("UserController.deleteUser: Request body is null.");
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
 
-            String username = user.getUsername().trim();
+            String username = request.getUsername().trim();
             if (username.isEmpty()) {
                 log.warn("UserController.deleteUser: Missing username in request.");
                 return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
             }
 
-            // Authentication & authorization: only allow the user themselves or admin to delete account
+            // Authentication & authorization: only allow the user themselves to delete account
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication == null || !authentication.isAuthenticated()) {
                 log.warn("UserController.deleteUser: Unauthenticated delete attempt for username={}", username);
@@ -140,10 +147,15 @@ public class UserController {
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
-            userByUsername.setPassword("null");
+            // Entity -> DTO
+            UserResDto response = new UserResDto(
+                    userByUsername.getUserId() != null ? userByUsername.getUserId().toString() : null,
+                    userByUsername.getUsername(),
+                    userByUsername.getEmail()
+            );
 
             log.info("UserController.deleteUser: Successfully deleted blogs for username={} (elapsed={}ms)", username, System.currentTimeMillis() - start);
-            return new ResponseEntity<>(userByUsername, HttpStatus.OK);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
             log.error("UserController.deleteUser: Exception while deleting user. error={}", e.getMessage(), e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

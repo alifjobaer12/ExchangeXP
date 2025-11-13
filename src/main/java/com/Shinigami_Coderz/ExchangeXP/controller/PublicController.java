@@ -1,5 +1,7 @@
 package com.Shinigami_Coderz.ExchangeXP.controller;
 
+import com.Shinigami_Coderz.ExchangeXP.dto.UserReqDto;
+import com.Shinigami_Coderz.ExchangeXP.dto.UserResDto;
 import com.Shinigami_Coderz.ExchangeXP.entity.User;
 import com.Shinigami_Coderz.ExchangeXP.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -37,20 +39,20 @@ public class PublicController {
         }    }
 
     @PostMapping("/create-user")                                                       //  Create a User
-    public ResponseEntity<?> createUser(@RequestBody(required = false) User user){
+    public ResponseEntity<?> createUser(@RequestBody(required = false) UserReqDto request){
         long start = System.currentTimeMillis();
         log.info("PublicController.createUser: Received request to create new user.");
 
         try {
             // Null-safety check
-            if (user == null) {
+            if (request == null) {
                 log.warn("PublicController.createUser: Request body is null.");
                 return new ResponseEntity<>("Request body is missing", HttpStatus.BAD_REQUEST);
             }
 
-            String username = user.getUsername().trim();
-            String password = user.getPassword().trim();
-            String email = user.getEmail().trim();
+            String username = request.getUsername().trim();
+            String password = request.getPassword().trim();
+            String email = request.getEmail().trim();
 
             // Validate inputs
             if (username.isEmpty() || password.isEmpty() || email.isEmpty()) {
@@ -65,15 +67,28 @@ public class PublicController {
                 return new ResponseEntity<>("Username already exists", HttpStatus.CONFLICT);
             }
 
+            // DTO -> Entity
+            User user = new User();
+            user.setUsername(username);
+            user.setPassword(password);
+            user.setEmail(email);
+
             // Save user
-            boolean saved = userService.saveNewUser(user);
-            if (!saved) {
+            User saved = userService.saveNewUser(user);
+            if (saved == null) {
                 log.error("PublicController.createUser: Failed to create new user '{}'.", username);
                 return new ResponseEntity<>("User creation failed", HttpStatus.BAD_REQUEST);
             }
 
+            // Entity -> DTO
+            UserResDto response = new UserResDto(
+                    saved.getUserId() != null ? saved.getUserId().toString() : null,
+                    saved.getUsername(),
+                    saved.getEmail()
+            );
+
             log.info("PublicController.createUser: Successfully created user '{}' (elapsed={}ms)", username, System.currentTimeMillis() - start);
-            return new ResponseEntity<>(user, HttpStatus.OK);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
             log.error("PublicController.createUser: Exception while creating user. error={}", e.getMessage(), e);
             return new ResponseEntity<>("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);

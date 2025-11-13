@@ -1,5 +1,7 @@
 package com.Shinigami_Coderz.ExchangeXP.controller;
 
+import com.Shinigami_Coderz.ExchangeXP.dto.BlogCommentReqDto;
+import com.Shinigami_Coderz.ExchangeXP.dto.BlogCommentResDto;
 import com.Shinigami_Coderz.ExchangeXP.entity.Blog;
 import com.Shinigami_Coderz.ExchangeXP.entity.BlogComment;
 import com.Shinigami_Coderz.ExchangeXP.service.BlogCommentService;
@@ -33,7 +35,7 @@ public class BlogCommentController {
     }
 
     @PostMapping("/post/{blogID}")                                            //  Post a Comment on a Blog
-    public ResponseEntity<?> addComment(@RequestBody BlogComment blogComment,
+    public ResponseEntity<?> addComment(@RequestBody BlogCommentReqDto request,
                                         @PathVariable String blogID){
 
         long start = System.currentTimeMillis();
@@ -50,21 +52,34 @@ public class BlogCommentController {
         }
 
         try {
-            if (blogComment.getComment().isEmpty()) {
+            if (request.getComment().isEmpty()) {
                 log.warn("BlogCommentController.addComment: Comment text is empty or null for blogId={}", blogId);
 
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
 
-            boolean success = blogCommentService.saveComment(blogComment, blogId);
-            if (!success) {
+            // DTO -> Entity
+            BlogComment blogComment = new BlogComment();
+            blogComment.setComment(request.getComment());
+
+            BlogComment saved = blogCommentService.saveComment(blogComment, blogId);
+            if (saved == null) {
                 log.error("BlogCommentController.addComment: Failed to save comment on blogId={}", blogId);
                 return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
             }
 
+            // Entity -> DTO
+            BlogCommentResDto response = new BlogCommentResDto(
+                    saved.getBlogCommentId() != null ? saved.getBlogCommentId().toString() : null,
+                    saved.getUser(),
+                    saved.getComment(),
+                    saved.getCommentAt(),
+                    saved.getBlogId()
+            );
+
             log.info("BlogCommentController.addComment: Comment added to blogId={} by user={} (elapsed={}ms)", blogId, blogComment.getUser(), System.currentTimeMillis() - start);
 
-            return new ResponseEntity<>(blogComment, HttpStatus.OK);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
             log.error("BlogCommentController.addComment: Exception while saving comment for blogId={}. error={}", blogId, e.getMessage(), e);
 
@@ -73,7 +88,7 @@ public class BlogCommentController {
     }
 
     @PutMapping("/update/{commentID}")                             //  Update a Comment
-    public ResponseEntity<?> updateComment(@RequestBody BlogComment comment,
+    public ResponseEntity<?> updateComment(@RequestBody BlogCommentReqDto request,
                                            @PathVariable String commentID){
 
         long start = System.currentTimeMillis();
@@ -102,12 +117,21 @@ public class BlogCommentController {
 
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             } else  {
-                commentById.setComment(comment.getComment().isEmpty() ? commentById.getComment() : comment.getComment());
-                blogCommentService.updateComment(commentById);
+                commentById.setComment(request.getComment().isEmpty() ? commentById.getComment() : request.getComment());
+                BlogComment blogComment = blogCommentService.updateComment(commentById);
+
+                // Entity -> DTO
+                BlogCommentResDto response = new BlogCommentResDto(
+                        blogComment.getBlogCommentId() != null ? blogComment.getBlogCommentId().toString() : null,
+                        blogComment.getUser(),
+                        blogComment.getComment(),
+                        blogComment.getCommentAt(),
+                        blogComment.getBlogId()
+                );
 
                 log.info("BlogCommentController.updateComment: Successfully updated commentId={} by user={} (elapsed={}ms)", commentId, username, System.currentTimeMillis() - start);
 
-                return new ResponseEntity<>(comment, HttpStatus.OK);
+                return new ResponseEntity<>(response, HttpStatus.OK);
             }
         } catch (Exception e) {
             log.error("BlogCommentController.updateComment: Exception while updating commentId={}. error={}", commentId, e.getMessage(), e);
@@ -155,6 +179,15 @@ public class BlogCommentController {
                     log.error("BlogCommentController.deleteComment: Failed to delete commentId={}", commentId);
                     return new ResponseEntity<>(HttpStatus.NOT_FOUND);
                 }
+
+                // Entity -> DTO
+                BlogCommentResDto response = new BlogCommentResDto(
+                        commentById.getBlogCommentId() != null ? commentById.getBlogCommentId().toString() : null,
+                        commentById.getUser(),
+                        commentById.getComment(),
+                        commentById.getCommentAt(),
+                        commentById.getBlogId()
+                );
 
                 log.info("BlogCommentController.deleteComment: Successfully deleted commentId={} by user={} (elapsed={}ms)",
                         commentId, username, System.currentTimeMillis() - start);

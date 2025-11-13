@@ -27,24 +27,24 @@ public class BlogService {
     private UserService userService;
 
     @Transactional
-    public boolean saveNewBlog(Blog blog, String username){                             //  Create a Blog
+    public Blog saveNewBlog(Blog blog, String username){                             //  Create a Blog
         long start = System.currentTimeMillis(); // ADDED
         log.info("BlogService.saveNewBlog: Request to save new blog for username={}", username); // ADDED
 
         if (blog == null) {
             log.warn("BlogService.saveNewBlog: Blog payload is null for username={}", username); // ADDED
-            return false; // ADDED
+            return null; // ADDED
         }
         if (username == null || username.trim().isEmpty()) {
             log.warn("BlogService.saveNewBlog: username is null/empty."); // ADDED
-            return false; // ADDED
+            return null; // ADDED
         }
 
         try {
             User userByUsername = userService.findUserByUsername(username);
             if (userByUsername == null) {
                 log.warn("BlogService.saveNewBlog: User not found username={}", username); // ADDED
-                return false; // ADDED
+                return null; // ADDED
             }
 
             blog.setBlogDate(LocalDateTime.now());
@@ -60,28 +60,30 @@ public class BlogService {
             userService.saveUser(userByUsername);
 
             log.info("BlogService.saveNewBlog: Blog saved blogId={} for username={} (elapsed={}ms)", saveBlog.getBlogId(), username, System.currentTimeMillis() - start); // ADDED
-            return true;
+            return saveBlog;
         } catch (Exception e){
             log.error("BlogService.saveNewBlog: Exception while saving blog for username={}. error={}", username, e.getMessage(), e); // CHANGED (was System.out)
-            return false;
+            return null;
         }
     }
 
     @Transactional
-    public void saveBlog(Blog blog){                                                    //  Update a Blog
+    public Blog saveBlog(Blog blog){                                                    //  Update a Blog
         long start = System.currentTimeMillis(); // ADDED
         log.info("BlogService.saveBlog: Request to save/update blogId={}", blog == null ? null : blog.getBlogId()); // ADDED
 
         if (blog == null) {
             log.warn("BlogService.saveBlog: Blog is null - nothing to save."); // ADDED
-            return; // ADDED
+            return null; // ADDED
         }
 
         try {
-            blogRepo.save(blog);
+            Blog save = blogRepo.save(blog);
             log.info("BlogService.saveBlog: Blog saved blogId={} (elapsed={}ms)", blog.getBlogId(), System.currentTimeMillis() - start); // ADDED
+            return save;
         } catch (Exception e){
             log.error("BlogService.saveBlog: Exception while saving blogId={}. error={}", blog.getBlogId(), e.getMessage(), e); // CHANGED (was System.out)
+            return null;
         }
     }
 

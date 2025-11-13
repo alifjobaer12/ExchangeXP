@@ -36,27 +36,27 @@ public class BlogCommentService {
     }
 
     @Transactional
-    public boolean saveComment(BlogComment comment, ObjectId blogId) {                   // Save a Comment
+    public BlogComment saveComment(BlogComment comment, ObjectId blogId) {                   // Save a Comment
         long start = System.currentTimeMillis();
         log.info("BlogCommentService.saveComment: Request to save comment for blogId={}", blogId);
 
         if (comment == null) {
             log.warn("BlogCommentService.saveComment: Comment is null for blogId={}", blogId);
-            return false;
+            return null;
         }
 
         try {
             Blog blogById = blogService.findBlogById(blogId);
             if (blogById == null) {
                 log.warn("BlogCommentService.saveComment: Blog not found blogId={}", blogId);
-                return false;
+                return null;
             }
 
             // Null-safe and trim comment text
             String text = comment.getComment().trim();
             if (text.isEmpty()) {
                 log.warn("BlogCommentService.saveComment: Comment text empty for blogId={}", blogId);
-                return false;
+                return null;
             }
             comment.setComment(text);
 
@@ -68,30 +68,32 @@ public class BlogCommentService {
 
             log.info("BlogCommentService.saveComment: Comment saved commentId={} for blogId={} (elapsed={}ms)",
                     save.getBlogCommentId(), blogId, System.currentTimeMillis() - start);
-            return true;
+            return save;
         } catch (Exception e){
             log.error("BlogCommentService.saveComment: Exception while saving comment for blogId={}. error={}", blogId, e.getMessage(), e); // CHANGED (was System.out)
-            return false;
+            return null;
         }
     }
 
-    public void updateComment(BlogComment comment) {                                    // Update a Comment
+    public BlogComment updateComment(BlogComment comment) {                                    // Update a Comment
         if (comment == null) {
             log.warn("BlogCommentService.updateComment: Received null comment update request.");
-            return;
+            return null;
         }
         try {
             // trim and validate comment text before save
             String text = comment.getComment().trim();
             if (text.isEmpty()) {
                 log.warn("BlogCommentService.updateComment: Comment text empty for commentId={}", comment.getBlogCommentId());
-                return;
+                return null;
             }
             comment.setComment(text);
-            blogCommentRepo.save(comment);
+            BlogComment save = blogCommentRepo.save(comment);
             log.info("BlogCommentService.updateComment: Updated commentId={}", comment.getBlogCommentId());
+            return save;
         } catch (Exception e) {
             log.error("BlogCommentService.updateComment: Exception while updating commentId={}. error={}", comment.getBlogCommentId(), e.getMessage(), e);
+            return null;
         }
     }
 

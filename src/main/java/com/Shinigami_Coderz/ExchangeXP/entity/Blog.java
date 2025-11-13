@@ -28,8 +28,6 @@ public class Blog {
 
     private LocalDateTime blogDate;
 
-//    private List<ObjectId> blogLikes =  new ArrayList<>();
-
     private String username;
 
     @DBRef

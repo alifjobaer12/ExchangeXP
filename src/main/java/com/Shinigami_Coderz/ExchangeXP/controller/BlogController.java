@@ -1,5 +1,8 @@
 package com.Shinigami_Coderz.ExchangeXP.controller;
 
+import com.Shinigami_Coderz.ExchangeXP.dto.BlogReqDto;
+import com.Shinigami_Coderz.ExchangeXP.dto.BlogResDto;
+import com.Shinigami_Coderz.ExchangeXP.dto.UserResDto;
 import com.Shinigami_Coderz.ExchangeXP.entity.Blog;
 import com.Shinigami_Coderz.ExchangeXP.entity.BlogComment;
 import com.Shinigami_Coderz.ExchangeXP.entity.User;
@@ -36,7 +39,7 @@ public class BlogController {
     }
 
     @PostMapping("/post")                                               //  Create a Blog
-    public ResponseEntity<?> postBlog(@RequestBody Blog blog) {
+    public ResponseEntity<?> postBlog(@RequestBody BlogReqDto request) {
         long start = System.currentTimeMillis();
 
         String username = getAuthenticatedUsername();
@@ -45,25 +48,39 @@ public class BlogController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
-        String title = blog.getBlogTitle().trim();
-        String content = blog.getBlogContent().trim();
+        String title = request.getBlogTitle().trim();
+        String content = request.getBlogContent().trim();
         if (title.isEmpty() || content.isEmpty()) {
             log.warn("postBlog: Validation failed for user={} - title or content empty.", username);
 
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
+        // DTO -> Entity
+        Blog blog = new Blog();
+        blog.setBlogTitle(title);
+        blog.setBlogContent(content);
+
         try {
-            boolean saved = blogService.saveNewBlog(blog, username);
-            if (!saved) {
+            Blog saved = blogService.saveNewBlog(blog, username);
+            if (saved == null) {
                 log.error("postBlog: Saving blog failed for user={}", username);
 
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
+            // Entity -> DTO
+            BlogResDto response = new BlogResDto(
+                    saved.getBlogId() != null ? saved.getBlogId().toString() : null,
+                    saved.getBlogTitle(),
+                    saved.getBlogContent(),
+                    saved.getBlogDate(),
+                    saved.getUsername()
+            );
+
             log.info("postBlog: Blog created successfully for user={} (title='{}'). elapsed={}ms", username, title, System.currentTimeMillis() - start);
 
-            return new ResponseEntity<>(blog, HttpStatus.CREATED);
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
         } catch (Exception e) {
             log.error("postBlog: Exception while creating blog for user={}. error={}", username, e.getMessage(), e);
 
@@ -163,9 +180,18 @@ public class BlogController {
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
+            // Entity -> DTO
+            BlogResDto response = new BlogResDto(
+                    blogById.getBlogId() != null ? blogById.getBlogId().toString() : null,
+                    blogById.getBlogTitle(),
+                    blogById.getBlogContent(),
+                    blogById.getBlogDate(),
+                    blogById.getUsername()
+            );
+
             log.info("deleteBlogById: Successfully deleted blogId={} for user={} (elapsed={}ms)", blogId, username, System.currentTimeMillis() - start);
 
-            return new ResponseEntity<>(blogById, HttpStatus.OK);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
             log.error("deleteBlogById: Exception deleting blogId={} for user={}. error={}", blogId, username, e.getMessage(), e);
 
@@ -175,7 +201,7 @@ public class BlogController {
 
     @PutMapping("/update/{blogID}")                                            //  Update Blog by Id
     public ResponseEntity<?> updateBlog(@PathVariable String blogID,
-                                        @RequestBody Blog blog){
+                                        @RequestBody BlogReqDto request){
         long start = System.currentTimeMillis();
 
         String username = getAuthenticatedUsername();
@@ -195,8 +221,8 @@ public class BlogController {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
 
-            String newTitle = blog.getBlogTitle().trim();
-            String newContent = blog.getBlogContent().trim();
+            String newTitle = request.getBlogTitle().trim();
+            String newContent = request.getBlogContent().trim();
 
             if (!newTitle.isEmpty()) {
                 blogById.setBlogTitle(newTitle);
@@ -205,10 +231,20 @@ public class BlogController {
                 blogById.setBlogContent(newContent);
             }
 
-            blogService.saveBlog(blogById);
+            Blog saved = blogService.saveBlog(blogById);
+
+            // Entity -> DTO
+            BlogResDto response = new BlogResDto(
+                    saved.getBlogId() != null ? saved.getBlogId().toString() : null,
+                    saved.getBlogTitle(),
+                    saved.getBlogContent(),
+                    saved.getBlogDate(),
+                    saved.getUsername()
+            );
+
             log.info("updateBlog: Successfully updated blogId={} by user={} (elapsed={}ms)", blogId, username, System.currentTimeMillis() - start);
 
-            return new ResponseEntity<>(blogById, HttpStatus.OK);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
             log.error("updateBlog: Exception updating blogId={} for user={}. error={}", blogId, username, e.getMessage(), e);
 

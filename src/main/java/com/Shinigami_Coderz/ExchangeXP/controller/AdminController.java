@@ -1,5 +1,7 @@
 package com.Shinigami_Coderz.ExchangeXP.controller;
 
+import com.Shinigami_Coderz.ExchangeXP.dto.UserReqDto;
+import com.Shinigami_Coderz.ExchangeXP.dto.UserResDto;
 import com.Shinigami_Coderz.ExchangeXP.entity.Blog;
 import com.Shinigami_Coderz.ExchangeXP.entity.User;
 import com.Shinigami_Coderz.ExchangeXP.service.BlogService;
@@ -66,19 +68,19 @@ public class AdminController {
     }
 
     @PostMapping("/create-admin")                                                       //  Create a AdminUser
-    public ResponseEntity<?> createUser(@RequestBody User user){
+    public ResponseEntity<?> createUser(@RequestBody UserReqDto request){
 
         long start = System.currentTimeMillis();
-        log.info("AdminController.createUser: Received request to create a new admin user. payloadUsername={}", user == null ? "null" : user.getUsername());
+        log.info("AdminController.createUser: Received request to create a new admin user. payloadUsername={}", request == null ? "null" : request.getUsername());
 
-        if (user == null) {
+        if (request == null) {
             log.warn("AdminController.createUser: Request body is null.");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        String username = user.getUsername().trim();
-        String password = user.getPassword().trim();
-        String email = user.getEmail().trim();
+        String username = request.getUsername().trim();
+        String password = request.getPassword().trim();
+        String email = request.getEmail().trim();
 
         if (username.isEmpty() || password.isEmpty() || email.isEmpty()){
             log.warn("AdminController.createUser: Missing required user fields for user: {}", username);
@@ -93,14 +95,27 @@ public class AdminController {
                 return new ResponseEntity<>(HttpStatus.CONFLICT);
             }
 
-            boolean isSaved = userService.saveAdminUser(user);
-            if(!isSaved){
+            // DTO -> Entity
+            User user = new User();
+            user.setUsername(username);
+            user.setPassword(password);
+            user.setEmail(email);
+
+            User saved = userService.saveAdminUser(user);
+            if(saved == null){
                 log.error("AdminController.createUser: Failed to create admin user: {}", username);
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
 
+            // Entity -> DTO
+            UserResDto response = new UserResDto(
+                    saved.getUserId() != null ? saved.getUserId().toString() : null,
+                    saved.getUsername(),
+                    saved.getEmail()
+            );
+
             log.info("AdminController.createUser: Successfully created admin user: {} (elapsed={}ms)", username, System.currentTimeMillis() - start); // ADDED
-            return new ResponseEntity<>(user, HttpStatus.CREATED);
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
         } catch (Exception e) {
             log.error("AdminController.createUser: Exception while creating admin user '{}'. error={}", username, e.getMessage(), e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

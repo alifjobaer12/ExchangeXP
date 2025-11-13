@@ -26,86 +26,88 @@ public class UserService {
 
 
     @Transactional
-    public boolean saveNewUser(User user){                                            //  Create a User
+    public User saveNewUser(User user){                                            //  Create a User
         long start = System.currentTimeMillis(); // ADDED
         log.info("UserService.saveNewUser: Request to create new user: {}", user == null ? null : user.getUsername()); // ADDED
 
         if (user == null) {
             log.warn("UserService.saveNewUser: Provided user object is null."); // ADDED
-            return false;
+            return null;
         }
 
         try {
             if (user.getPassword().isEmpty()) {
                 log.warn("UserService.saveNewUser: Missing password for username={}", user.getUsername()); // ADDED
-                return false;
+                return null;
             }
 
             if (user.getUsername().isEmpty()) {
                 log.warn("UserService.saveNewUser: Missing username in request."); // ADDED
-                return false;
+                return null;
             }
 
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             user.setRoles(Collections.singletonList("USER"));
-            userRepo.save(user);
+            User save = userRepo.save(user);
 
             log.info("UserService.saveNewUser: Successfully created user={} (elapsed={}ms)", user.getUsername(), System.currentTimeMillis() - start); // ADDED
-            return true;
+            return save;
         } catch (Exception e) {
             log.error("UserService.saveNewUser: Exception while saving user {}. error={}", user.getUsername(), e.getMessage(), e); // CHANGED (was System.out)
-            return false;
+            return null;
         }
     }
 
-    public void saveUser(User user){                                                  //  Save a User
+    public User saveUser(User user){                                                  //  Save a User
         long start = System.currentTimeMillis(); // ADDED
         log.info("UserService.saveUser: Request to save/update user={}", user == null ? null : user.getUsername()); // ADDED
 
         if (user == null) {
             log.warn("UserService.saveUser: Provided user object is null."); // ADDED
-            return;
+            return null;
         }
 
         try {
-            userRepo.save(user);
+            User save = userRepo.save(user);
             log.info("UserService.saveUser: Successfully saved user={} (elapsed={}ms)", user.getUsername(), System.currentTimeMillis() - start); // ADDED
+            return save;
         } catch (Exception e) {
             log.error("UserService.saveUser: Exception while saving user {}. error={}", user.getUsername(), e.getMessage(), e); // CHANGED (was System.out)
+            return null;
         }
     }
 
     @Transactional
-    public boolean saveAdminUser(User user){                                            //  Create a AdminUser
+    public User saveAdminUser(User user){                                            //  Create a AdminUser
         long start = System.currentTimeMillis(); // ADDED
         log.info("UserService.saveAdminUser: Request to create admin user: {}", user == null ? null : user.getUsername()); // ADDED
 
         if (user == null) {
             log.warn("UserService.saveAdminUser: Provided user object is null."); // ADDED
-            return false;
+            return null;
         }
 
         try {
             if (user.getPassword().isEmpty()) {
                 log.warn("UserService.saveAdminUser: Missing password for username={}", user.getUsername()); // ADDED
-                return false;
+                return null;
             }
 
             if (user.getUsername().isEmpty()) {
                 log.warn("UserService.saveAdminUser: Missing username in request."); // ADDED
-                return false;
+                return null;
             }
 
             user.setPassword(passwordEncoder.encode(user.getPassword()));
 
             user.setRoles(Arrays.asList("USER", "ADMIN")); // CHANGED
 
-            userRepo.save(user);
+            User save = userRepo.save(user);
             log.info("UserService.saveAdminUser: Successfully created admin user={} (elapsed={}ms)", user.getUsername(), System.currentTimeMillis() - start); // ADDED
-            return true;
+            return save;
         } catch (Exception e) {
             log.error("UserService.saveAdminUser: Exception while creating admin user {}. error={}", user.getUsername(), e.getMessage(), e); // CHANGED (was System.out)
-            return false;
+            return null;
         }
     }
 
