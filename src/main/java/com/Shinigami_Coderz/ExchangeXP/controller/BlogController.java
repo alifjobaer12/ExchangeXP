@@ -103,12 +103,14 @@ public class BlogController {
         }
     }
 
-    @GetMapping("/find/{blogId}")                                               //  Find Blog by Id
-    public ResponseEntity<?> findBlogById(@PathVariable ObjectId blogId){
+    @GetMapping("/find/{blogID}")                                               //  Find Blog by Id
+    public ResponseEntity<?> findBlogById(@PathVariable String blogID){
         long start = System.currentTimeMillis();
 
         String username = getAuthenticatedUsername();
-        log.info("findBlogById: Request to fetch blogId={} by user={}", blogId, username);
+        log.info("findBlogById: Request to fetch blogId={} by user={}", blogID, username);
+
+        ObjectId blogId = new ObjectId(blogID);
 
         if (username == null) {
             log.warn("findBlogById: Unauthenticated request rejected.");
@@ -133,12 +135,14 @@ public class BlogController {
         }
     }
 
-    @DeleteMapping("/delete/{blogId}")                                          //  Delete Blog by Id
-    public ResponseEntity<?> deleteBlogById(@PathVariable ObjectId blogId){
+    @DeleteMapping("/delete/{blogID}")                                          //  Delete Blog by Id
+    public ResponseEntity<?> deleteBlogById(@PathVariable String blogID){
         long start = System.currentTimeMillis();
 
         String username = getAuthenticatedUsername();
-        log.info("deleteBlogById: Request to delete blogId={} by user={}", blogId, username);
+        log.info("deleteBlogById: Request to delete blogID={} by user={}", blogID, username);
+
+        ObjectId blogId = new ObjectId(blogID);
 
         if (username == null) {
             log.warn("deleteBlogById: Unauthenticated request rejected.");
@@ -169,13 +173,15 @@ public class BlogController {
         }
     }
 
-    @PutMapping("/update/{blogId}")                                            //  Update Blog by Id
-    public ResponseEntity<?> updateBlog(@PathVariable ObjectId blogId,
+    @PutMapping("/update/{blogID}")                                            //  Update Blog by Id
+    public ResponseEntity<?> updateBlog(@PathVariable String blogID,
                                         @RequestBody Blog blog){
         long start = System.currentTimeMillis();
 
         String username = getAuthenticatedUsername();
-        log.info("updateBlog: Request to update blogId={} by user={}", blogId, username);
+        log.info("updateBlog: Request to update blogID={} by user={}", blogID, username);
+
+        ObjectId blogId = new ObjectId(blogID);
 
         if (username == null) {
             log.warn("updateBlog: Unauthenticated request rejected.");
@@ -210,11 +216,13 @@ public class BlogController {
         }
     }
 
-    @GetMapping("/all-comments/{blogId}")                                            //  Find All Comments of a Blog by blogId
-    public ResponseEntity<?> getAllCommentOfBlog(@PathVariable ObjectId blogId){
+    @GetMapping("/all-comments/{blogID}")                                            //  Find All Comments of a Blog by blogID
+    public ResponseEntity<?> getAllCommentOfBlog(@PathVariable String blogID){
         long start = System.currentTimeMillis();
 
-        log.info("getAllCommentOfBlog: Request to fetch comments for blogId={}", blogId);
+        log.info("getAllCommentOfBlog: Request to fetch comments for blogID={}", blogID);
+
+        ObjectId blogId = new ObjectId(blogID);
 
         try {
             Blog blog = blogService.findBlogById(blogId);

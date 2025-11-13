@@ -27,10 +27,12 @@ public class BlogLikeController {
     @Autowired
     private UserService userService;
 
-    @PostMapping("/{blogId}")
-    public ResponseEntity<?> toggleLike(@PathVariable ObjectId blogId) {
+    @PostMapping("/{blogID}")
+    public ResponseEntity<?> toggleLike(@PathVariable String blogID) {
         long start = System.currentTimeMillis();
-        log.info("BlogLikeController.toggleLike: Received toggle-like request for blogId={}", blogId);
+        log.info("BlogLikeController.toggleLike: Received toggle-like request for blogID={}", blogID);
+
+        ObjectId blogId = new ObjectId(blogID);
 
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -62,10 +64,12 @@ public class BlogLikeController {
         }
     }
 
-    @GetMapping("/get-liker/{blogId}")
-    public ResponseEntity<?> getLikes(@PathVariable ObjectId blogId) {
+    @GetMapping("/get-liker/{blogID}")
+    public ResponseEntity<?> getLikes(@PathVariable String blogID) {
         long start = System.currentTimeMillis();
-        log.info("BlogLikeController.getLikes: Received request to get likers for blogId={}", blogId);
+        log.info("BlogLikeController.getLikes: Received request to get likers for blogID={}", blogID);
+
+        ObjectId blogId = new ObjectId(blogID);
 
         try {
             List<ObjectId> likers = blogLikeService.getLikes(blogId);

@@ -32,12 +32,14 @@ public class BlogCommentController {
         return authentication.getName();
     }
 
-    @PostMapping("/post/{blogId}")                                            //  Post a Comment on a Blog
+    @PostMapping("/post/{blogID}")                                            //  Post a Comment on a Blog
     public ResponseEntity<?> addComment(@RequestBody BlogComment blogComment,
-                                        @PathVariable ObjectId blogId){
+                                        @PathVariable String blogID){
 
         long start = System.currentTimeMillis();
-        log.info("BlogCommentController.addComment: Received request to post a comment on blogId={}", blogId);
+        log.info("BlogCommentController.addComment: Received request to post a comment on blogId={}", blogID);
+
+        ObjectId blogId = new ObjectId(blogID);
 
         String username = getAuthenticatedUsername();
         log.info("addComment: Request to addComment of this blogId={} for user={}", blogId, username);
@@ -70,12 +72,14 @@ public class BlogCommentController {
         }
     }
 
-    @PutMapping("/update/{commentId}")                             //  Update a Comment
+    @PutMapping("/update/{commentID}")                             //  Update a Comment
     public ResponseEntity<?> updateComment(@RequestBody BlogComment comment,
-                                           @PathVariable ObjectId commentId){
+                                           @PathVariable String commentID){
 
         long start = System.currentTimeMillis();
-        log.info("BlogCommentController.updateComment: Received request to update commentId={}", commentId);
+        log.info("BlogCommentController.updateComment: Received request to update commentId={}", commentID);
+
+        ObjectId commentId = new ObjectId(commentID);
 
         String username = getAuthenticatedUsername();
         log.info("updateComment: Request to updateComment of this commentId={} for user={}", commentId, username);
@@ -112,11 +116,13 @@ public class BlogCommentController {
 
     }
 
-    @DeleteMapping("/delete/{commentId}")                          //  Delete a Comment
-    public ResponseEntity<?> deleteComment(@PathVariable ObjectId commentId){
+    @DeleteMapping("/delete/{commentID}")                          //  Delete a Comment
+    public ResponseEntity<?> deleteComment(@PathVariable String commentID){
 
         long start = System.currentTimeMillis();
-        log.info("BlogCommentController.deleteComment: Received request to delete commentId={}", commentId);
+        log.info("BlogCommentController.deleteComment: Received request to delete commentId={}", commentID);
+
+        ObjectId commentId = new ObjectId(commentID);
 
         String username = getAuthenticatedUsername();
         log.info("deleteComment: Request to deleteComment of this commentId={} for user={}", commentId, username);
