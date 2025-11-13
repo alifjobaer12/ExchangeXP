@@ -21,6 +21,34 @@ public class UserController {
     @Autowired
     private BlogService blogService;
 
+    @GetMapping("/profile/{username}")
+    public ResponseEntity<User> findUserByUsername(@PathVariable String username) {
+        long start = System.currentTimeMillis();
+        log.info("UserController.findUser: Received update request.");
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            log.warn("UserController.findUser: Unauthenticated request for username={}", username);
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        String requester = authentication.getName();
+        if (!requester.equals(username)) {
+            log.warn("UserController.findUser: Forbidden - requester='{}' cannot find username='{}'", requester, username);
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        User userByUsername = userService.findUserByUsername(username);
+        if(userByUsername == null){
+            log.warn("UserController.findUser: User not found username={}", username);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        log.info("UserController.findUser: Find for username={} (elapsed={}ms)", username, System.currentTimeMillis() - start);
+        return new ResponseEntity<>(userByUsername, HttpStatus.OK);
+    }
+
     @PostMapping("/update")                                                  //  Update User Password
     public ResponseEntity<?> updateUser(@RequestBody(required = false) User user){
         long start = System.currentTimeMillis();
