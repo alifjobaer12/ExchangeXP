@@ -60,9 +60,18 @@
 
         <dependency><groupId>com.google.firebase</groupId>
             <artifactId>firebase-admin</artifactId>
-            <version>9.1.1</version></dependency>
+            <version>9.1.1</version>
+        </dependency>
 
-	</dependencies>
+        <!-- springdoc-openapi starter with Swagger UI -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-ui</artifactId>
+            <version>1.7.0</version>
+        </dependency>
+
+
+    </dependencies>
 
 	<build>
 		<plugins>

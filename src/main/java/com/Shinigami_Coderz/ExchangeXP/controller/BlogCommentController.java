@@ -6,6 +6,7 @@ import com.Shinigami_Coderz.ExchangeXP.entity.Blog;
 import com.Shinigami_Coderz.ExchangeXP.entity.BlogComment;
 import com.Shinigami_Coderz.ExchangeXP.service.BlogCommentService;
 import com.Shinigami_Coderz.ExchangeXP.service.BlogService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
+@Tag(name = "Blog Comment APIs")
 @RequestMapping("/comment")
 public class BlogCommentController {
 

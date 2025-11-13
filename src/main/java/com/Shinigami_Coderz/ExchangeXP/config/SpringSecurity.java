@@ -40,7 +40,8 @@ public class SpringSecurity extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .antMatchers("/public/**", "/auth/**", "/ping").permitAll()                // public endpoints
+                .antMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll()                // Swagger: API Documentation & Design Tools for Teams
+                .antMatchers("/public/**", "/auth/**", "/ping").permitAll()                                      // public endpoints
                 .antMatchers("/user/**", "/blog/**", "/comment/**", "/like/**").authenticated()                // restricted endpoints
                 .antMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()               // default: authenticated
@@ -64,7 +65,7 @@ public class SpringSecurity extends WebSecurityConfigurerAdapter {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration cfg = new CorsConfiguration();
-        cfg.setAllowedOriginPatterns(Arrays.asList("https://exchangexp.netlify.app/"));                  // allows any origin while supporting credentials
+        cfg.setAllowedOriginPatterns(Arrays.asList("https://exchangexp.netlify.app/", "192.168.0.108"));                  // allows any origin while supporting credentials
         cfg.setAllowedMethods(Arrays.asList("GET","POST","PUT","DELETE","OPTIONS","PATCH"));
         cfg.setAllowedHeaders(Arrays.asList("*"));
         cfg.setAllowCredentials(true); // allow browser to send cookies / auth headers if needed

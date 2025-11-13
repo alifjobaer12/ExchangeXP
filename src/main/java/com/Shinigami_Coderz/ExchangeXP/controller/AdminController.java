@@ -6,6 +6,7 @@ import com.Shinigami_Coderz.ExchangeXP.entity.Blog;
 import com.Shinigami_Coderz.ExchangeXP.entity.User;
 import com.Shinigami_Coderz.ExchangeXP.service.BlogService;
 import com.Shinigami_Coderz.ExchangeXP.service.UserService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import java.util.List;
 
 @RestController
 @Slf4j
+@Tag(name = "Admin APIs")
 @RequestMapping("/admin")
 public class AdminController {
 

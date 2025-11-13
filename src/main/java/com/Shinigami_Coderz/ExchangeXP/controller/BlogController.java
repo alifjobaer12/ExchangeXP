@@ -8,6 +8,7 @@ import com.Shinigami_Coderz.ExchangeXP.entity.BlogComment;
 import com.Shinigami_Coderz.ExchangeXP.entity.User;
 import com.Shinigami_Coderz.ExchangeXP.service.BlogService;
 import com.Shinigami_Coderz.ExchangeXP.service.UserService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
+@Tag(name = "Blog APIs")
 @RequestMapping("/blog")
 public class BlogController {
 

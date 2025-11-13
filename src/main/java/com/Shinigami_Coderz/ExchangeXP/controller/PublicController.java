@@ -4,6 +4,7 @@ import com.Shinigami_Coderz.ExchangeXP.dto.UserReqDto;
 import com.Shinigami_Coderz.ExchangeXP.dto.UserResDto;
 import com.Shinigami_Coderz.ExchangeXP.entity.User;
 import com.Shinigami_Coderz.ExchangeXP.service.UserService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
+@Tag(name = "Public APIs")
 @RequestMapping("/public")
 public class PublicController {
 

@@ -3,6 +3,7 @@ package com.Shinigami_Coderz.ExchangeXP.controller;
 import com.Shinigami_Coderz.ExchangeXP.entity.User;
 import com.Shinigami_Coderz.ExchangeXP.service.BlogLikeService;
 import com.Shinigami_Coderz.ExchangeXP.service.UserService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@Tag(name = "Blog Like APIs")
 @RequestMapping("/like")
 @RequiredArgsConstructor
 @Slf4j
