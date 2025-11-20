@@ -19,3 +19,14 @@ logging:
 
 firebase:
   service-account-file: ${FIREBASE_JSON}
+
+
+springdoc:
+  swagger-ui:
+    path : /exchange-docs
+  api-docs:
+    path : /exchange-api-docs
+
+server:
+  servlet:
+    context-path: /exchangexp/api/
