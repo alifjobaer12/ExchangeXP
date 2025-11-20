@@ -40,7 +40,7 @@ public class SpringSecurity extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .antMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll()                // Swagger: API Documentation & Design Tools for Teams
+                .antMatchers("/api-docs/**", "/swagger-ui.html", "/swagger-ui/**", "/docs/**").permitAll()                // Swagger: API Documentation & Design Tools for Teams
                 .antMatchers("/public/**", "/auth/**", "/ping").permitAll()                                      // public endpoints
                 .antMatchers("/user/**", "/blog/**", "/comment/**", "/like/**").authenticated()                // restricted endpoints
                 .antMatchers("/admin/**").hasRole("ADMIN")
