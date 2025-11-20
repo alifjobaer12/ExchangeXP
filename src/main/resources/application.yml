@@ -23,9 +23,9 @@ firebase:
 
 springdoc:
   swagger-ui:
-    path : /exchange-docs
+    path : /docs
   api-docs:
-    path : /exchange-api-docs
+    path : /api-docs
 
 server:
   servlet:
