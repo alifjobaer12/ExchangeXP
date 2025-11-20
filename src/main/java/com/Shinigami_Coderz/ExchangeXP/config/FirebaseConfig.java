@@ -15,28 +15,40 @@ import java.io.InputStream;
 @Slf4j
 public class FirebaseConfig {
 
-    @Value("${firebase.service-account-file:}")
-    private String serviceAccountFile;
-
     @PostConstruct
     public void init() {
         try {
             if (FirebaseApp.getApps().isEmpty()) {
                 FirebaseOptions options;
-                if (serviceAccountFile != null && !serviceAccountFile.trim().isEmpty()) {
-                    log.info("Initializing Firebase using service account file: {}", serviceAccountFile);
-                    try (InputStream is = new FileInputStream(serviceAccountFile)) {
+
+                // 1) Prefer explicit path set by our startup script: FIREBASE_JSON
+                String firebaseJsonPath = System.getenv("FIREBASE_JSON");
+
+                // 2) Fallback to GOOGLE_APPLICATION_CREDENTIALS if set
+                String googleCreds = System.getenv("GOOGLE_APPLICATION_CREDENTIALS");
+
+                if (firebaseJsonPath != null && !firebaseJsonPath.trim().isEmpty()) {
+                    log.info("Initializing Firebase using FIREBASE_JSON file: {}", firebaseJsonPath);
+                    try (InputStream is = new FileInputStream(firebaseJsonPath)) {
+                        options = FirebaseOptions.builder()
+                                .setCredentials(GoogleCredentials.fromStream(is))
+                                .build();
+                    }
+                } else if (googleCreds != null && !googleCreds.trim().isEmpty()) {
+                    log.info("Initializing Firebase using GOOGLE_APPLICATION_CREDENTIALS: {}", googleCreds);
+                    try (InputStream is = new FileInputStream(googleCreds)) {
                         options = FirebaseOptions.builder()
                                 .setCredentials(GoogleCredentials.fromStream(is))
                                 .build();
                     }
                 } else {
-                    // fallback to Application Default Credentials (GOOGLE_APPLICATION_CREDENTIALS env var or cloud environment)
+                    // final fallback: application default creds (works on GCP platforms)
                     log.info("Initializing Firebase using Application Default Credentials");
                     options = FirebaseOptions.builder()
                             .setCredentials(GoogleCredentials.getApplicationDefault())
                             .build();
                 }
+
                 FirebaseApp.initializeApp(options);
                 log.info("FirebaseApp has been initialized");
             }

@@ -34,5 +34,7 @@ build/
 
 
 *.log
-
 *.json
+*.enc
+/**/scripts/
+/src/main/java/com/Shinigami_Coderz/ExchangeXP/scripts
