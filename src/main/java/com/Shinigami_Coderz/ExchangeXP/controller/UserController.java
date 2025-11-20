@@ -2,6 +2,7 @@ package com.Shinigami_Coderz.ExchangeXP.controller;
 
 import com.Shinigami_Coderz.ExchangeXP.dto.UserReqDto;
 import com.Shinigami_Coderz.ExchangeXP.dto.UserResDto;
+import com.Shinigami_Coderz.ExchangeXP.entity.Blog;
 import com.Shinigami_Coderz.ExchangeXP.entity.User;
 import com.Shinigami_Coderz.ExchangeXP.service.BlogService;
 import com.Shinigami_Coderz.ExchangeXP.service.UserService;
@@ -13,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -160,6 +163,27 @@ public class UserController {
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
             log.error("UserController.deleteUser: Exception while deleting user. error={}", e.getMessage(), e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/all-blogs")                                               //  Find all Blogs
+    public ResponseEntity<?> findAllBlog(){
+
+        long start = System.currentTimeMillis();
+        log.info("AdminController.findAllBlog: Received request to fetch all blogs.");
+
+        try {
+            List<Blog> allBlog = blogService.findAllBlog();
+            if (allBlog == null || allBlog.isEmpty()){
+                log.warn("PublicController.findAllBlog: No blogs found in the database.");
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+
+            log.info("PublicController.findAllBlog: Found {} blogs in the database. (elapsed={}ms)", allBlog.size(), System.currentTimeMillis() - start);
+            return new ResponseEntity<>(allBlog, HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("AdminController.findAllBlog: Exception while fetching blogs. error={}", e.getMessage(), e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

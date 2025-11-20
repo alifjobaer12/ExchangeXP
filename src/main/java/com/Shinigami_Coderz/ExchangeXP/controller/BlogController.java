@@ -62,6 +62,7 @@ public class BlogController {
         Blog blog = new Blog();
         blog.setBlogTitle(title);
         blog.setBlogContent(content);
+        blog.setBlogImageUrl(request.getBlogImageUrl());
 
         try {
             Blog saved = blogService.saveNewBlog(blog, username);
@@ -77,7 +78,8 @@ public class BlogController {
                     saved.getBlogTitle(),
                     saved.getBlogContent(),
                     saved.getBlogDate(),
-                    saved.getUsername()
+                    saved.getUsername(),
+                    saved.getBlogImageUrl()
             );
 
             log.info("postBlog: Blog created successfully for user={} (title='{}'). elapsed={}ms", username, title, System.currentTimeMillis() - start);
@@ -188,7 +190,8 @@ public class BlogController {
                     blogById.getBlogTitle(),
                     blogById.getBlogContent(),
                     blogById.getBlogDate(),
-                    blogById.getUsername()
+                    blogById.getUsername(),
+                    blogById.getBlogImageUrl()
             );
 
             log.info("deleteBlogById: Successfully deleted blogId={} for user={} (elapsed={}ms)", blogId, username, System.currentTimeMillis() - start);
@@ -241,7 +244,8 @@ public class BlogController {
                     saved.getBlogTitle(),
                     saved.getBlogContent(),
                     saved.getBlogDate(),
-                    saved.getUsername()
+                    saved.getUsername(),
+                    saved.getBlogImageUrl()
             );
 
             log.info("updateBlog: Successfully updated blogId={} by user={} (elapsed={}ms)", blogId, username, System.currentTimeMillis() - start);
