@@ -12,13 +12,10 @@ spring:
 
 logging:
   level:
-    com:
-      Shinigami_Coderz:
-        ExchangeXP:
-          com.Shinigami_Coderz.ExchangeXP.ExchangeXPt: trace
+    com.Shinigami_Coderz.ExchangeXP: trace
 
 firebase:
-  service-account-file: ${FIREBASE_JSON}
+  service-account-file: ${FIREBASE_JSON:}
 
 
 springdoc:
