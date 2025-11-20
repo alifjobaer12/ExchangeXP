@@ -23,8 +23,8 @@ public class SwaggerConfig {
                               .description("ExchangeXP API Documentation")
                 )
                 .servers(Arrays.asList(
-                    new Server().url("http://localhost:8080").description("local"),
-                    new Server().url("https://api.yourdomain.com").description("production")
+                    new Server().url("http://localhost:8080/exchangexp/api/").description("local"),
+                    new Server().url("https://k3j36wf9-8080.asse.devtunnels.ms/exchangexp/api/").description("production")
                 ))
                 .tags(Arrays.asList(
                     new Tag().name("Public APIs"),
