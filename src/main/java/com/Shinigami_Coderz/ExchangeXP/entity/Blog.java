@@ -32,4 +32,6 @@ public class Blog {
 
     @DBRef
     private List<BlogComment> blogComments = new ArrayList<>();
+
+    private List<String> blogImageUrl =  new ArrayList<>();
 }
