@@ -171,19 +171,19 @@ public class UserController {
     public ResponseEntity<?> findAllBlog(){
 
         long start = System.currentTimeMillis();
-        log.info("AdminController.findAllBlog: Received request to fetch all blogs.");
+        log.info("UserController.findAllBlog: Received request to fetch all blogs.");
 
         try {
             List<Blog> allBlog = blogService.findAllBlog();
             if (allBlog == null || allBlog.isEmpty()){
-                log.warn("PublicController.findAllBlog: No blogs found in the database.");
+                log.warn("UserController.findAllBlog: No blogs found in the database.");
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
 
-            log.info("PublicController.findAllBlog: Found {} blogs in the database. (elapsed={}ms)", allBlog.size(), System.currentTimeMillis() - start);
+            log.info("UserController.findAllBlog: Found {} blogs in the database. (elapsed={}ms)", allBlog.size(), System.currentTimeMillis() - start);
             return new ResponseEntity<>(allBlog, HttpStatus.OK);
         } catch (Exception e) {
-            log.error("AdminController.findAllBlog: Exception while fetching blogs. error={}", e.getMessage(), e);
+            log.error("UserController.findAllBlog: Exception while fetching blogs. error={}", e.getMessage(), e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
