@@ -24,7 +24,8 @@ public class SwaggerConfig {
                 )
                 .servers(Arrays.asList(
                     new Server().url("http://localhost:8080/exchangexp/api/").description("local"),
-                    new Server().url("https://k3j36wf9-8080.asse.devtunnels.ms/exchangexp/api/").description("production")
+                    new Server().url("https://k3j36wf9-8080.asse.devtunnels.ms/exchangexp/api/").description("port-forward"),
+                    new Server().url("https://exchangexp-production.up.railway.app/exchangexp/api/").description("production")
                 ))
                 .tags(Arrays.asList(
                     new Tag().name("Public APIs"),
