@@ -5,9 +5,8 @@ set -euo pipefail
 # FIREBASE_SA_ENC  => the base64 encrypted content (one long string; can be multiline)
 # FIREBASE_SA_KEY  => the passphrase to decrypt
 
-echo "DEBUG: FIREBASE_SA_ENC length: $(printf '%s' "$FIREBASE_SA_ENC" | wc -c)"
-echo "DEBUG: FIREBASE_SA_KEY length: $(printf '%s' "$FIREBASE_SA_KEY" | wc -c)"
-
+echo "DEBUG: FIREBASE_SA_ENC length: $(printf '%s' "${FIREBASE_SA_ENC:-}" | wc -c)"
+echo "DEBUG: FIREBASE_SA_KEY length: $(printf '%s' "${FIREBASE_SA_KEY:-}" | wc -c)"
 
 if [ -z "${FIREBASE_SA_ENC:-}" ] || [ -z "${FIREBASE_SA_KEY:-}" ]; then
   echo "ERROR: FIREBASE_SA_ENC and FIREBASE_SA_KEY must be set."
@@ -33,7 +32,5 @@ export FIREBASE_JSON="$TMP_JSON"
 # (Optional) Print confirmation (do NOT print secret contents)
 echo "Firebase credentials written to $FIREBASE_JSON"
 
-# Start the Spring Boot application (adjust jar name if different)
-# If you run with mvn spring-boot:run skip this and call mvn; for a jar use the line below:
+# Start the Spring Boot application
 exec java -jar /app/app.jar
-
