@@ -5,6 +5,10 @@ set -euo pipefail
 # FIREBASE_SA_ENC  => the base64 encrypted content (one long string; can be multiline)
 # FIREBASE_SA_KEY  => the passphrase to decrypt
 
+echo "DEBUG: FIREBASE_SA_ENC length: $(printf '%s' "$FIREBASE_SA_ENC" | wc -c)"
+echo "DEBUG: FIREBASE_SA_KEY length: $(printf '%s' "$FIREBASE_SA_KEY" | wc -c)"
+
+
 if [ -z "${FIREBASE_SA_ENC:-}" ] || [ -z "${FIREBASE_SA_KEY:-}" ]; then
   echo "ERROR: FIREBASE_SA_ENC and FIREBASE_SA_KEY must be set."
   echo "If running locally, export them or use the .env file (do NOT commit it)."
