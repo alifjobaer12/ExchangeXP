@@ -17,5 +17,6 @@ public class BlogResDto {
     private String blogContent;
     private LocalDateTime blogDate;
     private String username;
+    private String userPhotoUrl;
     private List<String> blogImageUrl =  new ArrayList<>();
 }

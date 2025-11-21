@@ -29,6 +29,8 @@ public class User {
     @NonNull
     private String email;
 
+    private String userPhotoUrl;
+
     private List<String> roles;
 
     private List<Integer> rating;

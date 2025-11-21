@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -49,6 +48,7 @@ public class BlogService {
 
             blog.setBlogDate(LocalDateTime.now());
             blog.setUsername(username);
+            blog.setUserPhotoUrl(blog.getUserPhotoUrl());
             Blog saveBlog = blogRepo.save(blog);
 
             if (userByUsername.getBlogs() == null) {

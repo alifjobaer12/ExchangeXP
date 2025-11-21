@@ -23,6 +23,9 @@ public class BlogCommentService {
     @Autowired
     private  BlogService blogService;
 
+    @Autowired
+    private UserService userService;
+
     public BlogComment findCommentById(ObjectId id){                                       //  Find a Comment
         log.debug("BlogCommentService.findCommentById: Searching for commentId={}", id);
         Optional<BlogComment> blogComment = blogCommentRepo.findById(id);
@@ -61,6 +64,8 @@ public class BlogCommentService {
             comment.setComment(text);
 
             comment.setCommentAt(LocalDateTime.now());
+            comment.setUsername(comment.getUsername());
+            comment.setUserPhotoUrl(userService.findUserByUsername(comment.getUsername()).getUserPhotoUrl());
             comment.setBlogId(blogId);
             BlogComment save = blogCommentRepo.save(comment);
             blogById.getBlogComments().add(save);

@@ -30,8 +30,12 @@ public class Blog {
 
     private String username;
 
+    private String userPhotoUrl;
+
     @DBRef
     private List<BlogComment> blogComments = new ArrayList<>();
 
     private List<String> blogImageUrl =  new ArrayList<>();
+
+    private List<ObjectId> likes = new ArrayList<>();
 }

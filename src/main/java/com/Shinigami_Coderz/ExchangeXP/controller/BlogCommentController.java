@@ -63,6 +63,7 @@ public class BlogCommentController {
             // DTO -> Entity
             BlogComment blogComment = new BlogComment();
             blogComment.setComment(request.getComment());
+            blogComment.setUsername(username);
 
             BlogComment saved = blogCommentService.saveComment(blogComment, blogId);
             if (saved == null) {
@@ -73,13 +74,14 @@ public class BlogCommentController {
             // Entity -> DTO
             BlogCommentResDto response = new BlogCommentResDto(
                     saved.getBlogCommentId() != null ? saved.getBlogCommentId().toString() : null,
-                    saved.getUser(),
+                    saved.getUsername(),
+                    saved.getUserPhotoUrl(),
                     saved.getComment(),
                     saved.getCommentAt(),
                     saved.getBlogId()
             );
 
-            log.info("BlogCommentController.addComment: Comment added to blogId={} by user={} (elapsed={}ms)", blogId, blogComment.getUser(), System.currentTimeMillis() - start);
+            log.info("BlogCommentController.addComment: Comment added to blogId={} by user={} (elapsed={}ms)", blogId, blogComment.getUsername(), System.currentTimeMillis() - start);
 
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
@@ -114,8 +116,8 @@ public class BlogCommentController {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
 
-            if (!username.equals(commentById.getUser())) {
-                log.warn("BlogCommentController.updateComment: Unauthorized update attempt by {} on comment owned by {}", username, commentById.getUser());
+            if (!username.equals(commentById.getUsername())) {
+                log.warn("BlogCommentController.updateComment: Unauthorized update attempt by {} on comment owned by {}", username, commentById.getUsername());
 
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             } else  {
@@ -125,7 +127,8 @@ public class BlogCommentController {
                 // Entity -> DTO
                 BlogCommentResDto response = new BlogCommentResDto(
                         blogComment.getBlogCommentId() != null ? blogComment.getBlogCommentId().toString() : null,
-                        blogComment.getUser(),
+                        blogComment.getUsername(),
+                        blogComment.getUserPhotoUrl(),
                         blogComment.getComment(),
                         blogComment.getCommentAt(),
                         blogComment.getBlogId()
@@ -171,9 +174,9 @@ public class BlogCommentController {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
 
-            if (!username.equals(commentById.getUser()) && !blogById.getUsername().equals(username)) {
+            if (!username.equals(commentById.getUsername()) && !blogById.getUsername().equals(username)) {
                 log.warn("BlogCommentController.deleteComment: Unauthorized delete attempt by {}. Comment owner={} Blog owner={}",
-                        username, commentById.getUser(), blogById.getUsername());
+                        username, commentById.getUsername(), blogById.getUsername());
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             } else {
                 boolean success = blogCommentService.deleteCommentById(blogById.getBlogId(), commentId);
@@ -185,7 +188,8 @@ public class BlogCommentController {
                 // Entity -> DTO
                 BlogCommentResDto response = new BlogCommentResDto(
                         commentById.getBlogCommentId() != null ? commentById.getBlogCommentId().toString() : null,
-                        commentById.getUser(),
+                        commentById.getUsername(),
+                        commentById.getUserPhotoUrl(),
                         commentById.getComment(),
                         commentById.getCommentAt(),
                         commentById.getBlogId()

@@ -55,6 +55,7 @@ public class PublicController {
             String username = request.getUsername().trim();
             String password = request.getPassword().trim();
             String email = request.getEmail().trim();
+            String userProfilePicUrl = request.getUserPhotoUrl().trim();
 
             // Validate inputs
             if (username.isEmpty() || password.isEmpty() || email.isEmpty()) {
@@ -74,6 +75,7 @@ public class PublicController {
             user.setUsername(username);
             user.setPassword(password);
             user.setEmail(email);
+            user.setUserPhotoUrl(userProfilePicUrl);
 
             // Save user
             User saved = userService.saveNewUser(user);

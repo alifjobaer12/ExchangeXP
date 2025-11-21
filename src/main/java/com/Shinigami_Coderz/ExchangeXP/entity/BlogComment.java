@@ -17,12 +17,14 @@ public class BlogComment {
     @Id
     private ObjectId blogCommentId;
 
-    private String user;
+    private String username;
+
+    private String userPhotoUrl;
+
+    private LocalDateTime commentAt;
 
     @NonNull
     private String comment;
-
-    private LocalDateTime commentAt;
 
     private ObjectId blogId;
 

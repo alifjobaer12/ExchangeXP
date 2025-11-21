@@ -13,7 +13,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class BlogCommentResDto {
     private String blogCommentId;
-    private String user;
+    private String username;
+    private String userPhotoUrl;
     @NonNull
     private String comment;
     private LocalDateTime commentAt;

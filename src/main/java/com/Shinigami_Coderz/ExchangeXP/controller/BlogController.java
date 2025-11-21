@@ -2,7 +2,6 @@ package com.Shinigami_Coderz.ExchangeXP.controller;
 
 import com.Shinigami_Coderz.ExchangeXP.dto.BlogReqDto;
 import com.Shinigami_Coderz.ExchangeXP.dto.BlogResDto;
-import com.Shinigami_Coderz.ExchangeXP.dto.UserResDto;
 import com.Shinigami_Coderz.ExchangeXP.entity.Blog;
 import com.Shinigami_Coderz.ExchangeXP.entity.BlogComment;
 import com.Shinigami_Coderz.ExchangeXP.entity.User;
@@ -63,6 +62,7 @@ public class BlogController {
         blog.setBlogTitle(title);
         blog.setBlogContent(content);
         blog.setBlogImageUrl(request.getBlogImageUrl());
+        blog.setUserPhotoUrl(userService.findUserByUsername(username).getUserPhotoUrl());
 
         try {
             Blog saved = blogService.saveNewBlog(blog, username);
@@ -79,6 +79,7 @@ public class BlogController {
                     saved.getBlogContent(),
                     saved.getBlogDate(),
                     saved.getUsername(),
+                    saved.getUserPhotoUrl(),
                     saved.getBlogImageUrl()
             );
 
@@ -191,6 +192,7 @@ public class BlogController {
                     blogById.getBlogContent(),
                     blogById.getBlogDate(),
                     blogById.getUsername(),
+                    blogById.getUserPhotoUrl(),
                     blogById.getBlogImageUrl()
             );
 
@@ -245,6 +247,7 @@ public class BlogController {
                     saved.getBlogContent(),
                     saved.getBlogDate(),
                     saved.getUsername(),
+                    saved.getUserPhotoUrl(),
                     saved.getBlogImageUrl()
             );
 

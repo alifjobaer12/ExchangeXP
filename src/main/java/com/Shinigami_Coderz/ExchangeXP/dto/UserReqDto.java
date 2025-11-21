@@ -15,4 +15,5 @@ public class UserReqDto {
     private String password;
     @NonNull
     private String email;
+    private String userPhotoUrl;
 }

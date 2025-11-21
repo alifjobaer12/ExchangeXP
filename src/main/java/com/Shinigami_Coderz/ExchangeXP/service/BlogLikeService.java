@@ -1,5 +1,6 @@
 package com.Shinigami_Coderz.ExchangeXP.service;
 
+import com.Shinigami_Coderz.ExchangeXP.entity.Blog;
 import com.Shinigami_Coderz.ExchangeXP.entity.BlogLike;
 import com.Shinigami_Coderz.ExchangeXP.repository.BlogLikeRepo;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +19,9 @@ public class BlogLikeService {
     @Autowired
     private BlogLikeRepo  blogLikeRepo;
 
+    @Autowired
+    private BlogService blogService;
+
     // Toggle like/unlike
     public boolean toggleLike(ObjectId blogId, ObjectId userId) {
         long start = System.currentTimeMillis(); // ADDED
@@ -30,12 +34,17 @@ public class BlogLikeService {
 
         try {
             boolean liked = isLiked(blogId, userId);
+            Blog blogById = blogService.findBlogById(blogId);
             if (liked) {
                 blogLikeRepo.deleteByBlogIdAndUserId(blogId, userId);
+                blogById.getLikes().removeIf(uid -> uid.equals(userId));
+                blogService.saveBlog(blogById);
                 log.info("BlogLikeService.toggleLike: User {} unliked blogId={} (elapsed={}ms)", userId, blogId, System.currentTimeMillis() - start); // ADDED
                 return false; // user unliked
             } else {
                 blogLikeRepo.save(new BlogLike(blogId, userId));
+                blogById.getLikes().add(userId);
+                blogService.saveBlog(blogById);
                 log.info("BlogLikeService.toggleLike: User {} liked blogId={} (elapsed={}ms)", userId, blogId, System.currentTimeMillis() - start); // ADDED
                 return true;  // user liked
             }
