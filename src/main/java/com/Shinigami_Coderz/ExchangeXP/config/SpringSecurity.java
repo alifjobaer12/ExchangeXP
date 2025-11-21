@@ -65,7 +65,7 @@ public class SpringSecurity extends WebSecurityConfigurerAdapter {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration cfg = new CorsConfiguration();
-        cfg.setAllowedOriginPatterns(Arrays.asList("https://exchangexp.netlify.app/", "192.168.0.108"));                  // allows any origin while supporting credentials
+        cfg.setAllowedOriginPatterns(Arrays.asList("*"));                  // allows any origin while supporting credentials
         cfg.setAllowedMethods(Arrays.asList("GET","POST","PUT","DELETE","OPTIONS","PATCH"));
         cfg.setAllowedHeaders(Arrays.asList("*"));
         cfg.setAllowCredentials(true); // allow browser to send cookies / auth headers if needed
