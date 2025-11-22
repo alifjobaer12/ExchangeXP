@@ -220,9 +220,23 @@ public class UserController {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
 
-            userByUsername.setAddress(request.getAddress());
-            userByUsername.setPhoneNumber(request.getPhoneNumber());
-            userByUsername.setUserPhotoUrl(request.getUserPhotoUrl());
+            userByUsername.setAddress(
+                    (request.getAddress() != null && !request.getAddress().trim().isEmpty())
+                            ? request.getAddress()
+                            : userByUsername.getAddress()
+            );
+
+            userByUsername.setPhoneNumber(
+                    (request.getPhoneNumber() != null && !request.getPhoneNumber().trim().isEmpty())
+                            ? request.getPhoneNumber()
+                            : userByUsername.getPhoneNumber()
+            );
+
+            userByUsername.setUserPhotoUrl(
+                    (request.getUserPhotoUrl() != null && !request.getUserPhotoUrl().trim().isEmpty())
+                            ? request.getUserPhotoUrl()
+                            : userByUsername.getUserPhotoUrl()
+            );
 
             User user = userService.saveUser(userByUsername);
 
