@@ -31,6 +31,10 @@ public class User {
 
     private String userPhotoUrl;
 
+    private String phoneNumber;
+
+    private String address;
+
     private List<String> roles;
 
     private List<Integer> rating;

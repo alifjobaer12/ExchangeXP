@@ -2,6 +2,7 @@ package com.Shinigami_Coderz.ExchangeXP.controller;
 
 import com.Shinigami_Coderz.ExchangeXP.dto.UserReqDto;
 import com.Shinigami_Coderz.ExchangeXP.dto.UserResDto;
+import com.Shinigami_Coderz.ExchangeXP.dto.UserUpdateProfileDto;
 import com.Shinigami_Coderz.ExchangeXP.entity.Blog;
 import com.Shinigami_Coderz.ExchangeXP.entity.User;
 import com.Shinigami_Coderz.ExchangeXP.service.BlogService;
@@ -56,7 +57,7 @@ public class UserController {
         return new ResponseEntity<>(userByUsername, HttpStatus.OK);
     }
 
-    @PostMapping("/update")                                                  //  Update User Password
+    @PostMapping("/update/password")                                                  //  Update User Password
     public ResponseEntity<?> updateUser(@RequestBody(required = false) UserReqDto request) {
         long start = System.currentTimeMillis();
         log.info("UserController.updateUser: Received update request.");
@@ -184,6 +185,60 @@ public class UserController {
             return new ResponseEntity<>(allBlog, HttpStatus.OK);
         } catch (Exception e) {
             log.error("UserController.findAllBlog: Exception while fetching blogs. error={}", e.getMessage(), e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/update/profile")                                                  //  Update User Profile
+    public ResponseEntity<?> updateUserProfile(@RequestBody(required = false) UserUpdateProfileDto request) {
+        long start = System.currentTimeMillis();
+        log.info("UserController.updateUserProfile: Received update request.");
+
+        try {
+            if (request == null) {
+                log.warn("UserController.updateUserProfile: Request body is null.");
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+
+            String username = request.getUsername().trim();
+
+            // Authentication & authorization: only allow the user themselves to update password
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || !authentication.isAuthenticated()) {
+                log.warn("UserController.updateUserProfile: Unauthenticated request for username={}", username);
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+            String requester = authentication.getName();
+            if (!requester.equals(username)) {
+                log.warn("UserController.updateUserProfile: Forbidden - requester='{}' cannot update username='{}'", requester, username);
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            }
+
+            User userByUsername = userService.findUserByUsername(username);
+            if(userByUsername == null){
+                log.warn("UserController.updateUserProfile: User not found username={}", username);
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+
+            userByUsername.setAddress(request.getAddress());
+            userByUsername.setPhoneNumber(request.getPhoneNumber());
+            userByUsername.setUserPhotoUrl(request.getUserPhotoUrl());
+
+            User user = userService.saveUser(userByUsername);
+
+            // Entity -> DTO
+            UserUpdateProfileDto response = new UserUpdateProfileDto(
+                    user.getUserId() != null ? user.getUserId().toString() : null,
+                    user.getUsername(),
+                    user.getUserPhotoUrl(),
+                    user.getPhoneNumber(),
+                    user.getAddress()
+            );
+
+            log.info("UserController.updateUserProfile: Password updated for username={} (elapsed={}ms)", username, System.currentTimeMillis() - start);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("UserController.updateUserProfile: Exception while updating user. error={}", e.getMessage(), e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
