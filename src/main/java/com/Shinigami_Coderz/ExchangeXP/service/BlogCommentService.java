@@ -137,5 +137,30 @@ public class BlogCommentService {
         }
     }
 
+    public List<BlogComment> findCommentByUsername(String username) {
+        log.debug("BlogCommentService.findCommentByUsername: Searching for username={}", username);
+
+        if (username == null || username.trim().isEmpty()) {
+            log.warn("BlogCommentService.findCommentByUsername: Received null/empty username.");
+            return java.util.Collections.emptyList();
+        }
+
+        try {
+            String uname = username.trim();
+            List<BlogComment> comments = blogCommentRepo.findByUsername(uname);
+
+            if (comments == null || comments.isEmpty()) {
+                log.debug("BlogCommentService.findCommentByUsername: No comments found for username={}", uname);
+                return java.util.Collections.emptyList();
+            } else {
+                log.debug("BlogCommentService.findCommentByUsername: Found {} comments for username={}", comments.size(), uname);
+                return comments;
+            }
+        } catch (Exception e) {
+            log.error("BlogCommentService.findCommentByUsername: Exception while searching comments for username={}. error={}", username, e.getMessage(), e);
+            return java.util.Collections.emptyList();
+        }
+    }
+
 
 }
