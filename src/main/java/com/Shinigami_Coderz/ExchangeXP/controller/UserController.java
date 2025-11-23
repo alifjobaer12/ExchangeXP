@@ -4,7 +4,9 @@ import com.Shinigami_Coderz.ExchangeXP.dto.UserReqDto;
 import com.Shinigami_Coderz.ExchangeXP.dto.UserResDto;
 import com.Shinigami_Coderz.ExchangeXP.dto.UserUpdateProfileDto;
 import com.Shinigami_Coderz.ExchangeXP.entity.Blog;
+import com.Shinigami_Coderz.ExchangeXP.entity.BlogComment;
 import com.Shinigami_Coderz.ExchangeXP.entity.User;
+import com.Shinigami_Coderz.ExchangeXP.service.BlogCommentService;
 import com.Shinigami_Coderz.ExchangeXP.service.BlogService;
 import com.Shinigami_Coderz.ExchangeXP.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @RestController
@@ -28,6 +31,8 @@ public class UserController {
     private UserService userService;
     @Autowired
     private BlogService blogService;
+    @Autowired
+    private BlogCommentService blogCommentService;
 
     @GetMapping("/profile/{username}")
     public ResponseEntity<User> findUserByUsername(@PathVariable String username) {
@@ -239,6 +244,23 @@ public class UserController {
             );
 
             User user = userService.saveUser(userByUsername);
+
+            if (Objects.equals(request.getUserPhotoUrl(), userByUsername.getUserPhotoUrl())) {
+                List<BlogComment> commentByUsername = blogCommentService.findCommentByUsername(userByUsername.getUsername());
+                if (!commentByUsername.isEmpty()) {
+                    for (BlogComment comment : commentByUsername) {
+                        comment.setUserPhotoUrl(userByUsername.getUserPhotoUrl());
+                        blogCommentService.saveComment(comment, comment.getBlogId());
+                    }
+                }
+
+                if (!userByUsername.getBlogs().isEmpty()) {
+                    for (Blog blog : userByUsername.getBlogs()) {
+                        blog.setUserPhotoUrl(request.getUserPhotoUrl());
+                        blogService.saveBlog(blog);
+                    }
+                }
+            }
 
             // Entity -> DTO
             UserUpdateProfileDto response = new UserUpdateProfileDto(
