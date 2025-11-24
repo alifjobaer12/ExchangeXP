@@ -18,8 +18,11 @@ import java.util.List;
 @Service
 public class UserService {
 
-    @Autowired
-    private UserRepo userRepo;
+    private final UserRepo userRepo;
+
+    public UserService(UserRepo userRepo) {
+        this.userRepo = userRepo;
+    }
 
     private static final PasswordEncoder passwordEncoder =  new BCryptPasswordEncoder();
 

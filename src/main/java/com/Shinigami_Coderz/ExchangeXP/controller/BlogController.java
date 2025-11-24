@@ -10,7 +10,6 @@ import com.Shinigami_Coderz.ExchangeXP.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -25,11 +24,14 @@ import java.util.List;
 @RequestMapping("/blog")
 public class BlogController {
 
-    @Autowired
-    private BlogService blogService;
+    private final BlogService blogService;
+    private final UserService userService;
 
-    @Autowired
-    private UserService userService;
+    public BlogController(BlogService blogService,
+                          UserService userService) {
+        this.blogService = blogService;
+        this.userService = userService;
+    }
 
     private String getAuthenticatedUsername() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -40,7 +42,7 @@ public class BlogController {
     }
 
     @PostMapping("/post")                                               //  Create a Blog
-    public ResponseEntity<?> postBlog(@RequestBody BlogReqDto request) {
+    public ResponseEntity<BlogResDto> postBlog(@RequestBody BlogReqDto request) {
         long start = System.currentTimeMillis();
 
         String username = getAuthenticatedUsername();
@@ -94,7 +96,7 @@ public class BlogController {
     }
 
     @GetMapping("/findAll")                                               //  Find all Blogs
-    public ResponseEntity<?> findAllBlog(){
+    public ResponseEntity<List<Blog>> findAllBlog(){
         long start = System.currentTimeMillis();
 
         String username = getAuthenticatedUsername();
@@ -126,7 +128,7 @@ public class BlogController {
     }
 
     @GetMapping("/find/{blogID}")                                               //  Find Blog by Id
-    public ResponseEntity<?> findBlogById(@PathVariable String blogID){
+    public ResponseEntity<Blog> findBlogById(@PathVariable String blogID){
         long start = System.currentTimeMillis();
 
         String username = getAuthenticatedUsername();
@@ -158,7 +160,7 @@ public class BlogController {
     }
 
     @DeleteMapping("/delete/{blogID}")                                          //  Delete Blog by Id
-    public ResponseEntity<?> deleteBlogById(@PathVariable String blogID){
+    public ResponseEntity<BlogResDto> deleteBlogById(@PathVariable String blogID){
         long start = System.currentTimeMillis();
 
         String username = getAuthenticatedUsername();
@@ -207,7 +209,7 @@ public class BlogController {
     }
 
     @PutMapping("/update/{blogID}")                                            //  Update Blog by Id
-    public ResponseEntity<?> updateBlog(@PathVariable String blogID,
+    public ResponseEntity<BlogResDto> updateBlog(@PathVariable String blogID,
                                         @RequestBody BlogReqDto request){
         long start = System.currentTimeMillis();
 
@@ -262,7 +264,7 @@ public class BlogController {
     }
 
     @GetMapping("/all-comments/{blogID}")                                            //  Find All Comments of a Blog by blogID
-    public ResponseEntity<?> getAllCommentOfBlog(@PathVariable String blogID){
+    public ResponseEntity<List<BlogComment>> getAllCommentOfBlog(@PathVariable String blogID){
         long start = System.currentTimeMillis();
 
         log.info("getAllCommentOfBlog: Request to fetch comments for blogID={}", blogID);

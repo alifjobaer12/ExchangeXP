@@ -11,7 +11,6 @@ import com.Shinigami_Coderz.ExchangeXP.service.BlogService;
 import com.Shinigami_Coderz.ExchangeXP.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -27,12 +26,17 @@ import java.util.Objects;
 @RequestMapping("/user")
 public class UserController {
 
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private BlogService blogService;
-    @Autowired
-    private BlogCommentService blogCommentService;
+    private final UserService userService;
+    private final BlogService blogService;
+    private final BlogCommentService blogCommentService;
+
+    public UserController(UserService userService,
+                            BlogService blogService,
+                            BlogCommentService blogCommentService) {
+        this.userService = userService;
+        this.blogService = blogService;
+        this.blogCommentService = blogCommentService;
+    }
 
     @GetMapping("/profile/{username}")
     public ResponseEntity<User> findUserByUsername(@PathVariable String username) {
@@ -63,7 +67,7 @@ public class UserController {
     }
 
     @PostMapping("/update/password")                                                  //  Update User Password
-    public ResponseEntity<?> updateUser(@RequestBody(required = false) UserReqDto request) {
+    public ResponseEntity<UserResDto> updateUser(@RequestBody(required = false) UserReqDto request) {
         long start = System.currentTimeMillis();
         log.info("UserController.updateUser: Received update request.");
 
@@ -118,7 +122,7 @@ public class UserController {
     }
 
     @DeleteMapping("/delete")                                                  //  Delete User
-    public ResponseEntity<?> deleteUser(@RequestBody(required = false) UserReqDto request){
+    public ResponseEntity<UserResDto> deleteUser(@RequestBody(required = false) UserReqDto request){
         long start = System.currentTimeMillis();
         log.info("UserController.deleteUser: Received delete request.");
 
@@ -174,7 +178,7 @@ public class UserController {
     }
 
     @GetMapping("/all-blogs")                                               //  Find all Blogs
-    public ResponseEntity<?> findAllBlog(){
+    public ResponseEntity<List<Blog>> findAllBlog(){
 
         long start = System.currentTimeMillis();
         log.info("UserController.findAllBlog: Received request to fetch all blogs.");
@@ -195,7 +199,7 @@ public class UserController {
     }
 
     @PostMapping("/update/profile")                                                  //  Update User Profile
-    public ResponseEntity<?> updateUserProfile(@RequestBody(required = false) UserUpdateProfileDto request) {
+    public ResponseEntity<UserUpdateProfileDto> updateUserProfile(@RequestBody(required = false) UserUpdateProfileDto request) {
         long start = System.currentTimeMillis();
         log.info("UserController.updateUserProfile: Received update request.");
 

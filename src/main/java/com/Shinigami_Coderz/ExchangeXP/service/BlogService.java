@@ -6,7 +6,6 @@ import com.Shinigami_Coderz.ExchangeXP.entity.User;
 import com.Shinigami_Coderz.ExchangeXP.repository.BlogRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,11 +18,13 @@ import java.util.Optional;
 @Service
 public class BlogService {
 
-    @Autowired
-    private BlogRepo blogRepo;
+    private final BlogRepo blogRepo;
+    private final UserService userService;
 
-    @Autowired
-    private UserService userService;
+    public BlogService(BlogRepo blogRepo, UserService userService) {
+        this.blogRepo = blogRepo;
+        this.userService = userService;
+    }
 
     @Transactional
     public Blog saveNewBlog(Blog blog, String username){                             //  Create a Blog

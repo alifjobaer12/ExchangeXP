@@ -4,10 +4,8 @@ import com.Shinigami_Coderz.ExchangeXP.entity.User;
 import com.Shinigami_Coderz.ExchangeXP.service.BlogLikeService;
 import com.Shinigami_Coderz.ExchangeXP.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -19,18 +17,20 @@ import java.util.List;
 @RestController
 @Tag(name = "Blog Like APIs")
 @RequestMapping("/like")
-@RequiredArgsConstructor
 @Slf4j
 public class BlogLikeController {
 
-    @Autowired
-    private BlogLikeService blogLikeService;
+    private final BlogLikeService blogLikeService;
+    private final UserService userService;
 
-    @Autowired
-    private UserService userService;
+    public BlogLikeController(BlogLikeService blogLikeService,
+                              UserService userService) {
+        this.blogLikeService = blogLikeService;
+        this.userService = userService;
+    }
 
     @PostMapping("/{blogID}")
-    public ResponseEntity<?> toggleLike(@PathVariable String blogID) {
+    public ResponseEntity<Long> toggleLike(@PathVariable String blogID) {
         long start = System.currentTimeMillis();
         log.info("BlogLikeController.toggleLike: Received toggle-like request for blogID={}", blogID);
 
@@ -67,7 +67,7 @@ public class BlogLikeController {
     }
 
     @GetMapping("/get-liker/{blogID}")
-    public ResponseEntity<?> getLikes(@PathVariable String blogID) {
+    public ResponseEntity<List<ObjectId>> getLikes(@PathVariable String blogID) {
         long start = System.currentTimeMillis();
         log.info("BlogLikeController.getLikes: Received request to get likers for blogID={}", blogID);
 

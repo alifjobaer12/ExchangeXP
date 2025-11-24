@@ -48,11 +48,11 @@ public class FirebaseAuthenticationFilter extends OncePerRequestFilter {
                 String uid = decodedToken.getUid();
                 String email = decodedToken.getEmail();
 
-//                if (email == null || !isEmailVerified(decodedToken)) {
-//                    log.warn("FirebaseAuthenticationFilter: Email missing or not verified (email={})", email);
-//                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-//                    return;
-//                }
+                if (email == null || !isEmailVerified(decodedToken)) {
+                    log.warn("FirebaseAuthenticationFilter: Email missing or not verified (email={})", email);
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    return;
+                }
 
 
                 // Find application user by email

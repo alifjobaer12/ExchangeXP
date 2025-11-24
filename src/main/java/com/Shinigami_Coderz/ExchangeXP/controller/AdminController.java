@@ -8,7 +8,6 @@ import com.Shinigami_Coderz.ExchangeXP.service.BlogService;
 import com.Shinigami_Coderz.ExchangeXP.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,14 +20,16 @@ import java.util.List;
 @RequestMapping("/admin")
 public class AdminController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+    private final BlogService blogService;
 
-    @Autowired
-    private BlogService blogService;
+    public AdminController(UserService userService, BlogService blogService) {
+        this.userService = userService;
+        this.blogService = blogService;
+    }
 
     @GetMapping("/all-users")                                                  //  All User
-    public ResponseEntity<?> findAllUsers(){
+    public ResponseEntity<List<User>> findAllUsers(){
 
         long start = System.currentTimeMillis();
         log.info("AdminController.findAllUsers: Received request to fetch all users.");
@@ -49,7 +50,7 @@ public class AdminController {
     }
 
     @GetMapping("/all-blogs")                                               //  Find all Blogs
-    public ResponseEntity<?> findAllBlog(){
+    public ResponseEntity<List<Blog>> findAllBlog(){
 
         long start = System.currentTimeMillis();
         log.info("AdminController.findAllBlog: Received request to fetch all blogs.");
@@ -70,7 +71,7 @@ public class AdminController {
     }
 
     @PostMapping("/create-admin")                                                       //  Create a AdminUser
-    public ResponseEntity<?> createUser(@RequestBody UserReqDto request){
+    public ResponseEntity<UserResDto> createUser(@RequestBody UserReqDto request){
 
         long start = System.currentTimeMillis();
         log.info("AdminController.createUser: Received request to create a new admin user. payloadUsername={}", request == null ? "null" : request.getUsername());

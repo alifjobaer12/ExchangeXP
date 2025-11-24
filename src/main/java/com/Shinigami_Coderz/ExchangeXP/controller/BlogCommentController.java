@@ -9,7 +9,6 @@ import com.Shinigami_Coderz.ExchangeXP.service.BlogService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -22,11 +21,14 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/comment")
 public class BlogCommentController {
 
-    @Autowired
-    private BlogCommentService blogCommentService;
+    private final BlogCommentService blogCommentService;
+    private final BlogService blogService;
 
-    @Autowired
-    private BlogService blogService;
+    public BlogCommentController(BlogCommentService blogCommentService,
+                                 BlogService blogService) {
+        this.blogCommentService = blogCommentService;
+        this.blogService = blogService;
+    }
 
     private String getAuthenticatedUsername() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -37,7 +39,7 @@ public class BlogCommentController {
     }
 
     @PostMapping("/post/{blogID}")                                            //  Post a Comment on a Blog
-    public ResponseEntity<?> addComment(@RequestBody BlogCommentReqDto request,
+    public ResponseEntity<BlogCommentResDto> addComment(@RequestBody BlogCommentReqDto request,
                                         @PathVariable String blogID){
 
         long start = System.currentTimeMillis();
@@ -92,7 +94,7 @@ public class BlogCommentController {
     }
 
     @PutMapping("/update/{commentID}")                             //  Update a Comment
-    public ResponseEntity<?> updateComment(@RequestBody BlogCommentReqDto request,
+    public ResponseEntity<BlogCommentResDto> updateComment(@RequestBody BlogCommentReqDto request,
                                            @PathVariable String commentID){
 
         long start = System.currentTimeMillis();
@@ -146,7 +148,7 @@ public class BlogCommentController {
     }
 
     @DeleteMapping("/delete/{commentID}")                          //  Delete a Comment
-    public ResponseEntity<?> deleteComment(@PathVariable String commentID){
+    public ResponseEntity<BlogCommentResDto> deleteComment(@PathVariable String commentID){
 
         long start = System.currentTimeMillis();
         log.info("BlogCommentController.deleteComment: Received request to delete commentId={}", commentID);
@@ -197,7 +199,7 @@ public class BlogCommentController {
 
                 log.info("BlogCommentController.deleteComment: Successfully deleted commentId={} by user={} (elapsed={}ms)",
                         commentId, username, System.currentTimeMillis() - start);
-                return new ResponseEntity<>(commentById, HttpStatus.OK);
+                return new ResponseEntity<>(response, HttpStatus.OK);
             }
         } catch (Exception e) {
             log.error("BlogCommentController.deleteComment: Exception while deleting commentId={}. error={}", commentId, e.getMessage(), e);
