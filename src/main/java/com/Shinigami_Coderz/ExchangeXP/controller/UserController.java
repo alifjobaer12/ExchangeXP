@@ -50,11 +50,11 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
-        String requester = authentication.getName();
-        if (!requester.equals(username)) {
-            log.warn("UserController.findUser: Forbidden - requester='{}' cannot find username='{}'", requester, username);
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
+//        String requester = authentication.getName();
+//        if (!requester.equals(username)) {
+//            log.warn("UserController.findUser: Forbidden - requester='{}' cannot find username='{}'", requester, username);
+//            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+//        }
 
         User userByUsername = userService.findUserByUsername(username);
         if(userByUsername == null){
