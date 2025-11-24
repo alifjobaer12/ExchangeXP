@@ -5,7 +5,6 @@ import com.Shinigami_Coderz.ExchangeXP.entity.BlogLike;
 import com.Shinigami_Coderz.ExchangeXP.repository.BlogLikeRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -16,11 +15,14 @@ import java.util.stream.Collectors;
 @Service
 public class BlogLikeService {
 
-    @Autowired
-    private BlogLikeRepo  blogLikeRepo;
+    private final BlogLikeRepo blogLikeRepo;
+    private final BlogService blogService;
 
-    @Autowired
-    private BlogService blogService;
+    public BlogLikeService(BlogLikeRepo blogLikeRepo,
+                           BlogService blogService) {
+        this.blogLikeRepo = blogLikeRepo;
+        this.blogService = blogService;
+    }
 
     // Toggle like/unlike
     public boolean toggleLike(ObjectId blogId, ObjectId userId) {

@@ -6,7 +6,6 @@ import com.Shinigami_Coderz.ExchangeXP.entity.User;
 import com.Shinigami_Coderz.ExchangeXP.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,18 +16,21 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/public")
 public class PublicController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+
+    public PublicController(UserService userService) {
+        this.userService = userService;
+    }
 
 
     @GetMapping("/google-signin/{email}")
-    public ResponseEntity<?> googleSignIn(@PathVariable String email) {
+    public ResponseEntity<Void> googleSignIn(@PathVariable String email) {
         log.info("sign in with google, {}", email);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/health-check")                                                  //  Health Check
-    public ResponseEntity<?> healthCheck() {
+    public ResponseEntity<String> healthCheck() {
         long start = System.currentTimeMillis();
         log.info("PublicController.healthCheck: Received health check request.");
 

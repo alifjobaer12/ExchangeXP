@@ -5,7 +5,6 @@ import com.Shinigami_Coderz.ExchangeXP.entity.BlogComment;
 import com.Shinigami_Coderz.ExchangeXP.repository.BlogCommentRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,14 +16,18 @@ import java.util.Optional;
 @Service
 public class BlogCommentService {
 
-    @Autowired
-    private BlogCommentRepo blogCommentRepo;
+    private final BlogCommentRepo blogCommentRepo;
+    private final BlogService blogService;
+    private final UserService userService;
 
-    @Autowired
-    private  BlogService blogService;
+    public BlogCommentService(BlogCommentRepo blogCommentRepo,
+                              BlogService blogService,
+                              UserService userService) {
+        this.blogCommentRepo = blogCommentRepo;
+        this.blogService = blogService;
+        this.userService = userService;
+    }
 
-    @Autowired
-    private UserService userService;
 
     public BlogComment findCommentById(ObjectId id){                                       //  Find a Comment
         log.debug("BlogCommentService.findCommentById: Searching for commentId={}", id);
