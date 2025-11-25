@@ -37,5 +37,5 @@ public class Blog {
 
     private List<String> blogImageUrl =  new ArrayList<>();
 
-    private List<ObjectId> likes = new ArrayList<>();
+    private List<String> likes = new ArrayList<>();
 }
