@@ -51,7 +51,7 @@ public class BlogLikeController {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
 
-            boolean liked = blogLikeService.toggleLike(blogId, userByUsername.getUserId());
+            boolean liked = blogLikeService.toggleLike(blogId, userByUsername.getUsername());
             long totalLikes = blogLikeService.countLikes(blogId);
 
             if (liked) {

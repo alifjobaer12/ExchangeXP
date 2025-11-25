@@ -82,7 +82,9 @@ public class BlogController {
                     saved.getBlogDate(),
                     saved.getUsername(),
                     saved.getUserPhotoUrl(),
-                    saved.getBlogImageUrl()
+                    saved.getBlogImageUrl(),
+                    saved.getBlogComments(),
+                    saved.getLikes()
             );
 
             log.info("postBlog: Blog created successfully for user={} (title='{}'). elapsed={}ms", username, title, System.currentTimeMillis() - start);
@@ -195,7 +197,9 @@ public class BlogController {
                     blogById.getBlogDate(),
                     blogById.getUsername(),
                     blogById.getUserPhotoUrl(),
-                    blogById.getBlogImageUrl()
+                    blogById.getBlogImageUrl(),
+                    blogById.getBlogComments(),
+                    blogById.getLikes()
             );
 
             log.info("deleteBlogById: Successfully deleted blogId={} for user={} (elapsed={}ms)", blogId, username, System.currentTimeMillis() - start);
@@ -250,7 +254,9 @@ public class BlogController {
                     saved.getBlogDate(),
                     saved.getUsername(),
                     saved.getUserPhotoUrl(),
-                    saved.getBlogImageUrl()
+                    saved.getBlogImageUrl(),
+                    saved.getBlogComments(),
+                    saved.getLikes()
             );
 
             log.info("updateBlog: Successfully updated blogId={} by user={} (elapsed={}ms)", blogId, username, System.currentTimeMillis() - start);

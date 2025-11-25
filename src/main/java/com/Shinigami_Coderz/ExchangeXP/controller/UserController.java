@@ -1,5 +1,6 @@
 package com.Shinigami_Coderz.ExchangeXP.controller;
 
+import com.Shinigami_Coderz.ExchangeXP.dto.BlogResDto;
 import com.Shinigami_Coderz.ExchangeXP.dto.UserReqDto;
 import com.Shinigami_Coderz.ExchangeXP.dto.UserResDto;
 import com.Shinigami_Coderz.ExchangeXP.dto.UserUpdateProfileDto;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -41,7 +43,7 @@ public class UserController {
     @GetMapping("/profile/{username}")
     public ResponseEntity<User> findUserByUsername(@PathVariable String username) {
         long start = System.currentTimeMillis();
-        log.info("UserController.findUser: Received update request.");
+        log.info("UserController.findUser: Received view profile request.");
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -178,7 +180,7 @@ public class UserController {
     }
 
     @GetMapping("/all-blogs")                                               //  Find all Blogs
-    public ResponseEntity<List<Blog>> findAllBlog(){
+    public ResponseEntity<List<BlogResDto>> findAllBlog(){
 
         long start = System.currentTimeMillis();
         log.info("UserController.findAllBlog: Received request to fetch all blogs.");
@@ -190,8 +192,22 @@ public class UserController {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
 
+            List<BlogResDto> dtoList = allBlog.stream()
+                    .map(saved -> new BlogResDto(
+                            saved.getBlogId() != null ? saved.getBlogId().toString() : null,
+                            saved.getBlogTitle(),
+                            saved.getBlogContent(),
+                            saved.getBlogDate(),
+                            saved.getUsername(),
+                            saved.getUserPhotoUrl(),
+                            saved.getBlogImageUrl(),
+                            saved.getBlogComments(),
+                            saved.getLikes()
+                    ))
+                    .collect(Collectors.toList());
+
             log.info("UserController.findAllBlog: Found {} blogs in the database. (elapsed={}ms)", allBlog.size(), System.currentTimeMillis() - start);
-            return new ResponseEntity<>(allBlog, HttpStatus.OK);
+            return new ResponseEntity<>(dtoList, HttpStatus.OK);
         } catch (Exception e) {
             log.error("UserController.findAllBlog: Exception while fetching blogs. error={}", e.getMessage(), e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

@@ -2,11 +2,13 @@ package com.Shinigami_Coderz.ExchangeXP.service;
 
 import com.Shinigami_Coderz.ExchangeXP.entity.Blog;
 import com.Shinigami_Coderz.ExchangeXP.entity.BlogLike;
+import com.Shinigami_Coderz.ExchangeXP.entity.User;
 import com.Shinigami_Coderz.ExchangeXP.repository.BlogLikeRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,45 +19,73 @@ public class BlogLikeService {
 
     private final BlogLikeRepo blogLikeRepo;
     private final BlogService blogService;
+    private final UserService userService;
 
     public BlogLikeService(BlogLikeRepo blogLikeRepo,
-                           BlogService blogService) {
+                           BlogService blogService, UserService userService) {
         this.blogLikeRepo = blogLikeRepo;
         this.blogService = blogService;
+        this.userService = userService;
     }
 
     // Toggle like/unlike
-    public boolean toggleLike(ObjectId blogId, ObjectId userId) {
-        long start = System.currentTimeMillis(); // ADDED
-        log.info("BlogLikeService.toggleLike: Received request to toggle like for blogId={} by userId={}", blogId, userId); // ADDED
+    public boolean toggleLike(ObjectId blogId, String username) {
+        long start = System.currentTimeMillis();
+        log.info("BlogLikeService.toggleLike: Received request to toggle like for blogId={} by username={}", blogId, username);
 
-        if (blogId == null || userId == null) { // ADDED
-            log.warn("BlogLikeService.toggleLike: blogId or userId is null (blogId={}, userId={})", blogId, userId);
+        if (blogId == null || username == null) {
+            log.warn("BlogLikeService.toggleLike: blogId or username is null (blogId={}, username={})", blogId, username);
             return false;
         }
 
         try {
-            boolean liked = isLiked(blogId, userId);
+            // Resolve user and blog
+            User userByUsername = userService.findUserByUsername(username);
+            if (userByUsername == null) {
+                log.warn("BlogLikeService.toggleLike: user not found username={}", username);
+                return false;
+            }
+            ObjectId userId = userByUsername.getUserId();
+
             Blog blogById = blogService.findBlogById(blogId);
+            if (blogById == null) {
+                log.warn("BlogLikeService.toggleLike: blog not found blogId={}", blogId);
+                return false;
+            }
+
+            // Check using userId (same identifier used when saving)
+            boolean liked = isLiked(blogId, userId);
+
             if (liked) {
+                // Remove like record (use userId)
                 blogLikeRepo.deleteByBlogIdAndUserId(blogId, userId);
-                blogById.getLikes().removeIf(uid -> uid.equals(userId));
+
+                // Remove username from blog.likes list (this is a list of usernames)
+                blogById.getLikes().removeIf(unm -> unm.equals(username));
                 blogService.saveBlog(blogById);
-                log.info("BlogLikeService.toggleLike: User {} unliked blogId={} (elapsed={}ms)", userId, blogId, System.currentTimeMillis() - start); // ADDED
-                return false; // user unliked
+
+                log.info("BlogLikeService.toggleLike: User {} unliked blogId={} (elapsed={}ms)", username, blogId, System.currentTimeMillis() - start);
+                return false;
             } else {
+                // Save like record (userId)
                 blogLikeRepo.save(new BlogLike(blogId, userId));
-                blogById.getLikes().add(userId);
+
+                // Add username to blog.likes list
+                if (blogById.getLikes() == null) {
+                    blogById.setLikes(new ArrayList<>());
+                }
+                blogById.getLikes().add(username);
                 blogService.saveBlog(blogById);
-                log.info("BlogLikeService.toggleLike: User {} liked blogId={} (elapsed={}ms)", userId, blogId, System.currentTimeMillis() - start); // ADDED
-                return true;  // user liked
+
+                log.info("BlogLikeService.toggleLike: User {} liked blogId={} (elapsed={}ms)", username, blogId, System.currentTimeMillis() - start);
+                return true;
             }
         } catch (Exception e) {
-            log.error("BlogLikeService.toggleLike: Exception toggling like for blogId={} userId={}. error={}",
-                    blogId, userId, e.getMessage(), e); // ADDED
+            log.error("BlogLikeService.toggleLike: Exception toggling like for blogId={} username={}. error={}", blogId, username, e.getMessage(), e);
             return false;
         }
     }
+
 
     // Count likes
     public long countLikes(ObjectId blogId) {

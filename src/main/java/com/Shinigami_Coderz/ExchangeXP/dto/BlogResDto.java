@@ -1,8 +1,10 @@
 package com.Shinigami_Coderz.ExchangeXP.dto;
 
+import com.Shinigami_Coderz.ExchangeXP.entity.BlogComment;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.bson.types.ObjectId;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -19,4 +21,7 @@ public class BlogResDto {
     private String username;
     private String userPhotoUrl;
     private List<String> blogImageUrl =  new ArrayList<>();
+    private List<BlogComment> blogComments = new ArrayList<>();
+    private List<String> likes = new ArrayList<>();
+
 }
