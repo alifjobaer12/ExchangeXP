@@ -6,7 +6,6 @@ RUN chmod +x mvnw
 RUN ./mvnw -B -DskipTests package
 
 
-
 FROM eclipse-temurin:8-jdk
 WORKDIR /app
 COPY --from=build /src/target/*.jar /app/app.jar
